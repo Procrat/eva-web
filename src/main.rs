@@ -45,6 +45,7 @@ pub extern fn list_tasks() -> *mut c_char {
         .map(|tasks| {
             tasks.into_iter().map(|task| {
                 Task {
+                    id: task.id.unwrap(),
                     content: task.content,
                     deadline: format!("{}", task.deadline),
                     duration_minutes: task.duration.num_minutes(),
@@ -52,6 +53,14 @@ pub extern fn list_tasks() -> *mut c_char {
                 }
             }).collect::<Vec<_>>()
         });
+
+    let serialised = jsonify_result(result).unwrap();
+    string_to_cstr(&serialised)
+}
+
+#[no_mangle]
+pub extern fn remove_task(id: u32) -> *mut c_char {
+    let result = eva::remove(&configuration(), id);
 
     let serialised = jsonify_result(result).unwrap();
     string_to_cstr(&serialised)
@@ -75,6 +84,7 @@ struct NewTask {
 
 #[derive(Debug, Serialize)]
 struct Task {
+    id: u32,
     content: String,
     deadline: String,
     duration_minutes: i64,

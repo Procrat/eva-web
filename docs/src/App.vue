@@ -17,6 +17,7 @@
         <span>{{ task.deadline }}</span>
         <span>{{ Math.floor(task.duration_minutes / 60) }}h{{ (task.duration_minutes % 60 != 0) ? task.duration_minutes % 60 : "" }}</span>
         <span>{{ task.importance }}</span>
+        <button @click="remove(task.id)">Remove</button>
       </li>
     </ol>
   </div>
@@ -62,9 +63,17 @@ export default {
       }
     },
     tasks () {
-      console.log(this.api.list_tasks());
       return this.api.list_tasks();
     },
+    remove (id) {
+      let result = this.api.remove_task(id);
+      if (result != null) {
+        this.pseudo_flash = result.error;
+      } else {
+        this.pseudo_flash = '';
+      }
+      this.$forceUpdate();
+    }
   },
 }
 </script>
