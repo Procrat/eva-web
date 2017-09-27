@@ -13,6 +13,7 @@ export default function() {
   });
 
   return idb_promise.then(() => ({
+
     add_task: function(task) {
       let result = Module.ccall('add_task', 'string', ['string'], [JSON.stringify(task)]);
       FS.syncfs(false, (err) => {
@@ -20,10 +21,12 @@ export default function() {
       });
       return JSON.parse(result);
     },
+
     list_tasks: function() {
       let result = Module.ccall('list_tasks', 'string', [], []);
       return JSON.parse(result);
     },
+
     remove_task: function(id) {
       let result = Module.ccall('remove_task', 'string', ['number'], [id]);
       FS.syncfs(false, (err) => {
@@ -31,9 +34,11 @@ export default function() {
       });
       return JSON.parse(result);
     },
-    print_schedule: function() {
-      let result = Module.ccall('print_schedule', 'string', [], []);
+
+    schedule: function() {
+      let result = Module.ccall('schedule', 'string', [], []);
       return JSON.parse(result);
     },
+
   }));
 };

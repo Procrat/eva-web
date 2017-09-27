@@ -20,10 +20,11 @@ extern {}
 fn main() {}
 
 #[no_mangle]
-pub extern fn print_schedule() -> *mut c_char {
-    let result = eva::print_schedule(&configuration(), "importance");
+pub extern fn schedule() -> *mut c_char {
+    let schedule = eva::schedule(&configuration(), "importance")
+        .map(Schedule::new);
 
-    let serialised = jsonify_result(result).unwrap();
+    let serialised = jsonify_result(schedule).unwrap();
     string_to_cstr(&serialised)
 }
 
@@ -43,15 +44,7 @@ pub extern fn add_task(new_task_json: *mut c_char) -> *mut c_char {
 pub extern fn list_tasks() -> *mut c_char {
     let result = eva::list_tasks(&configuration())
         .map(|tasks| {
-            tasks.into_iter().map(|task| {
-                Task {
-                    id: task.id.unwrap(),
-                    content: task.content,
-                    deadline: format!("{}", task.deadline),
-                    duration_minutes: task.duration.num_minutes(),
-                    importance: task.importance,
-                }
-            }).collect::<Vec<_>>()
+            tasks.into_iter().map(Task::new).collect::<Vec<_>>()
         });
 
     let serialised = jsonify_result(result).unwrap();
@@ -92,8 +85,44 @@ struct Task {
 }
 
 #[derive(Debug, Serialize)]
+struct Schedule(Vec<ScheduledTask>);
+
+#[derive(Debug, Serialize)]
+struct ScheduledTask {
+    task: Task,
+    when: String,
+}
+
+#[derive(Debug, Serialize)]
 struct Error {
     error: String,
+}
+
+impl Task {
+    fn new(task: eva::Task) -> Self {
+        Task {
+            id: task.id.unwrap(),
+            content: task.content,
+            deadline: format!("{}", task.deadline),
+            duration_minutes: task.duration.num_minutes(),
+            importance: task.importance,
+        }
+    }
+}
+
+impl Schedule {
+    fn new(schedule: eva::Schedule) -> Self {
+         Schedule(schedule.0.into_iter().map(ScheduledTask::new).collect())
+    }
+}
+
+impl ScheduledTask {
+    fn new(scheduled_task: eva::ScheduledTask) -> Self {
+        ScheduledTask {
+            task: Task::new(scheduled_task.task),
+            when: format!("{}", scheduled_task.when),
+        }
+    }
 }
 
 
