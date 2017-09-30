@@ -4,6 +4,7 @@ version = "0.0.1"
 authors = ["Stijn Seghers <stijnseghers@gmail.com>"]
 
 [dependencies]
+chrono = { version = "0.4", features = ["serde"] }
 error-chain = "0.10"
 eva = { git = "https://github.com/Procrat/eva", branch = "web-integration" }
 serde = "1.0"

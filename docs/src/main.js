@@ -1,4 +1,6 @@
 import Vue from 'vue'
+import VueConstants from 'vue-constants'
+
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-default/index.css'
 import locale from 'element-ui/lib/locale/lang/en'
@@ -8,6 +10,7 @@ import Api from './api'
 
 
 Vue.use(ElementUI, { locale });
+Vue.use(VueConstants);
 
 Api().then(api =>
   new Vue({

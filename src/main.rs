@@ -1,5 +1,6 @@
 #![feature(link_args)]
 
+extern crate chrono;
 #[macro_use]
 extern crate error_chain;
 extern crate eva;
@@ -11,6 +12,9 @@ extern crate serde_derive;
 
 use std::ffi::{CStr, CString};
 use std::os::raw::c_char;
+use std::time::Duration;
+
+use chrono::{DateTime, Local};
 
 use errors::Result;
 
@@ -46,7 +50,8 @@ pub extern fn add_task(new_task_json: *mut c_char) -> *mut c_char {
     let new_task_json = cstr_to_string(&new_task_json);
     let result = (|| {
         let new_task: NewTask = serde_json::from_str(&new_task_json)?;
-        Ok(eva::add(&configuration(), &new_task.content, &new_task.deadline, &new_task.duration,
+        Ok(eva::add(&configuration(), &new_task.content, new_task.deadline,
+                    Duration::from_secs((new_task.duration_minutes * 60) as u64),
                     new_task.importance)?)
     })();
 
@@ -86,8 +91,8 @@ fn configuration() -> eva::configuration::Configuration {
 #[derive(Debug, Deserialize)]
 struct NewTask {
     content: String,
-    deadline: String,
-    duration: String,
+    deadline: DateTime<Local>,
+    duration_minutes: u32,
     importance: u32,
 }
 
