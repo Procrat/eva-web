@@ -2,6 +2,7 @@
 name = "eva-web"
 version = "0.0.1"
 dependencies = [
+ "error-chain 0.10.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "eva 0.0.1 (git+https://github.com/Procrat/eva?branch=web-integration)",
  "serde 1.0.15 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_derive 1.0.15 (registry+https://github.com/rust-lang/crates.io-index)",
