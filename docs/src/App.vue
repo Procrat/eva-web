@@ -217,6 +217,11 @@ export default {
         this.pseudoFlash = result.error;
       } else {
         this.pseudoFlash = "Task added!";
+        this.content = '';
+        this.deadlineDate = '';
+        this.deadlineTime = '';
+        this.durationMinutes = '';
+        this.importance = 5;
       }
       this.$forceUpdate();
     },
