@@ -100,7 +100,7 @@ struct NewTask {
 struct Task {
     id: u32,
     content: String,
-    deadline: String,
+    deadline: DateTime<Local>,
     duration_minutes: i64,
     importance: u32,
 }
@@ -111,7 +111,7 @@ struct Schedule(Vec<ScheduledTask>);
 #[derive(Debug, Serialize)]
 struct ScheduledTask {
     task: Task,
-    when: String,
+    when: DateTime<Local>,
 }
 
 #[derive(Debug, Serialize)]
@@ -124,7 +124,7 @@ impl Task {
         Task {
             id: task.id.unwrap(),
             content: task.content,
-            deadline: format!("{}", task.deadline),
+            deadline: task.deadline,
             duration_minutes: task.duration.num_minutes(),
             importance: task.importance,
         }
@@ -141,7 +141,7 @@ impl ScheduledTask {
     fn new(scheduled_task: eva::ScheduledTask) -> Self {
         ScheduledTask {
             task: Task::new(scheduled_task.task),
-            when: format!("{}", scheduled_task.when),
+            when: scheduled_task.when,
         }
     }
 }

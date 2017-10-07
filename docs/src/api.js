@@ -24,7 +24,13 @@ export default function() {
 
     listTasks: function() {
       let result = Module.ccall('list_tasks', 'string', [], []);
-      return JSON.parse(result);
+      let parsed = JSON.parse(result);
+      if (parsed != null && parsed.error == null) {
+        parsed.forEach(task => {
+          task.deadline = new Date(Date.parse(task.deadline));
+        });
+      }
+      return parsed;
     },
 
     removeTask: function(id) {
@@ -37,7 +43,14 @@ export default function() {
 
     schedule: function() {
       let result = Module.ccall('schedule', 'string', [], []);
-      return JSON.parse(result);
+      let parsed = JSON.parse(result);
+      if (parsed != null && parsed.error == null) {
+        parsed.forEach(scheduled_task => {
+          scheduled_task.when = new Date(Date.parse(scheduled_task.when));
+          scheduled_task.task.deadline = new Date(Date.parse(scheduled_task.task.deadline));
+        });
+      }
+      return parsed;
     },
 
   }));

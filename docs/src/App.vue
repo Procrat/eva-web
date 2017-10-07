@@ -2,10 +2,10 @@
   <div id="app">
     <div>{{ pseudoFlash }}</div>
 
-    <el-row>
+    <el-row :gutter="15">
       <el-col id="sidebar" :span="4">
         <el-card>
-          <el-form>
+          <el-form class="add-task-form">
             <el-form-item>
               <el-input v-model="content"
                 placeholder="What do you want to do?"
@@ -64,31 +64,94 @@
       </el-col>
 
       <el-col :span="20">
-        <div>
-          <ul>
-            <li class="task" v-for="task in tasks()">
-              <span>{{ task.content }}</span>
-              <span>{{ task.deadline }}</span>
-              <span>{{ Math.floor(task.durationMinutes / 60) }}h{{ (task.durationMinutes % 60 != 0) ? task.durationMinutes % 60 : "" }}</span>
-              <span>{{ task.importance }}</span>
-              <button @click="remove(task.id)">Remove</button>
-            </li>
-          </ul>
-        </div>
+        <el-card>
+          <div v-if="scheduleError">
+            <el-alert
+              type="error"
+              title=""
+              :description="scheduleError"
+              show-icon
+              :closable="false"
+              />
 
-        <div>
-          <button @click="reschedule">Reschedule</button>
-          <div v-if="scheduleError">{{ scheduleError }}</div>
-          <div v-else-if="schedule.length > 0">
-            <ol>
-              <li v-for="scheduledTask in schedule">
-                <span>{{ scheduledTask.when }}</span>
-                <span>{{ scheduledTask.task.content }}</span>
-              </li>
-            </ol>
+            <el-table :data="tasks()"
+              key="taskList">
+              <el-table-column>
+                <template scope="scope">{{ scope.row.content }}</template>
+              </el-table-column>
+              <el-table-column label="Deadline"
+                align="center"
+                width="140px">
+                <template scope="scope">{{ formatDatetime(scope.row.deadline) }}</template>
+              </el-table-column>
+              <el-table-column label="Duration"
+                align="center"
+                width="100px">
+                <template scope="scope">{{ formatDuration(scope.row.duration_minutes) }}</template>
+              </el-table-column>
+              <el-table-column label="Importance"
+                align="center"
+                width="120px">
+                <template scope="scope">{{ scope.row.importance }}</template>
+              </el-table-column>
+              <el-table-column
+                align="center"
+                width="66px">
+                <template scope="scope">
+                  <el-button @click="remove(scope.row.id)"
+                    type="danger"
+                    :plain="true"
+                    icon="delete"
+                    size="mini"
+                    />
+                </template>
+              </el-table-column>
+            </el-table>
           </div>
-          <div v-else>Spinner</div>
-        </div>
+
+          <div v-else>
+            <el-table :data="schedule"
+              key="schedule"
+              v-loading="loading"
+              element-loading-text="Forging your schedule...">
+              <el-table-column label="Schedule"
+                align="center"
+                width="140px">
+                <template scope="scope">{{ formatDatetime(scope.row.when) }}</template>
+              </el-table-column>
+              <el-table-column>
+                <template scope="scope">{{ scope.row.task.content }}</template>
+              </el-table-column>
+              <el-table-column label="Deadline"
+                align="center"
+                width="140px">
+                <template scope="scope">{{ formatDatetime(scope.row.task.deadline) }}</template>
+              </el-table-column>
+              <el-table-column label="Duration"
+                align="center"
+                width="100px">
+                <template scope="scope">{{ formatDuration(scope.row.task.duration_minutes) }}</template>
+              </el-table-column>
+              <el-table-column label="Importance"
+                align="center"
+                width="120px">
+                <template scope="scope">{{ scope.row.task.importance }}</template>
+              </el-table-column>
+              <el-table-column
+                align="center"
+                width="66px">
+                <template scope="scope">
+                  <el-button @click="remove(scope.row.task.id)"
+                    type="danger"
+                    :plain="true"
+                    icon="delete"
+                    size="mini"
+                    />
+                </template>
+              </el-table-column>
+            </el-table>
+          </div>
+        </el-card>
       </el-col>
     </el-row>
   </div>
@@ -126,8 +189,8 @@ export default {
       {minutes: 10, stringified: "10 minutes"},
       {minutes: 15, stringified: "15 minutes"},
       {minutes: 30, stringified: "30 minutes"},
-      {minutes: 1, stringified: "1 hour"},
-      {minutes: 2, stringified: "2 hours"},
+      {minutes: 60, stringified: "1 hour"},
+      {minutes: 120, stringified: "2 hours"},
     ],
     timePickerOptions: {
       firstDayOfWeek: 1,
@@ -189,8 +252,12 @@ export default {
       importance: 5,
       pseudoFlash: '',
       schedule: [],
+      loading: true,
       scheduleError: '',
     }
+  },
+  created() {
+    this.reschedule();
   },
   methods: {
     addTask(event) {
@@ -200,7 +267,7 @@ export default {
       assert(this.durationMinutes, 'No duration given');
 
       let deadline = this.deadlineDate || today();
-      let deadlineTime = (this.deadlineTime || '00:00')
+      let deadlineTime = (this.deadlineTime || '23:59')
         .split(':')
         .map((value) => parseInt(value));
       deadline.setHours(deadlineTime[0], deadlineTime[1]);
@@ -223,11 +290,46 @@ export default {
         this.durationMinutes = '';
         this.importance = 5;
       }
-      this.$forceUpdate();
+
+      this.reschedule();
     },
 
     formatImportance(importance) {
       return "Importance: " + importance;
+    },
+
+    formatDatetime(datetime) {
+      let date = stripTime(datetime);
+      let dateStr;
+      if (date.getTime() === today().getTime()) {
+        dateStr = "";
+      } else if (date.getTime() === addDays(today(), 1).getTime()) {
+        dateStr = "Tomorrow";
+      } else {
+        dateStr = date.getDate() + "/" + date.getMonth();
+      }
+
+      let timeStr = datetime.getHours() + ":"
+                    + datetime.getMinutes().toString().padStart(2, "0");
+      if (timeStr == "23:59") {
+        timeStr = "";
+      }
+
+      let datetimeStr = [dateStr, timeStr].join(" ").trim();
+      if (datetimeStr == "") {
+        datetimeStr = "Today";
+      }
+      return datetimeStr;
+    },
+
+    formatDuration(durationMinutes) {
+      let hours = Math.floor(durationMinutes / 60);
+      let minutes = durationMinutes % 60;
+      if (hours > 0) {
+        return hours + "h" + (minutes == 0 ? "" : minutes);
+      } else {
+        return minutes + "m";
+      }
     },
 
     remove(id) {
@@ -237,7 +339,7 @@ export default {
       } else {
         this.pseudoFlash = '';
       }
-      this.$forceUpdate();
+      this.reschedule();
     },
 
     reschedule(event) {
@@ -246,10 +348,10 @@ export default {
       if (result.error == null) {
         this.scheduleError = '';
         this.schedule = result;
+        this.loading = false;
       } else {
         this.scheduleError = result.error;
       }
-      this.$forceUpdate();
     },
 
     tasks() {
@@ -264,11 +366,18 @@ export default {
 *
   font-family: "Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑",Arial,sans-serif
 
-.duration, .deadline-date, .deadline-time
-  width: 100% !important
+.add-task-form
+  .duration, .deadline-date, .deadline-time
+    width: 100% !important
 
-.task > span
-  display: inline-block
-  min-width: 125px
-  text-align: center
+.el-alert
+  margin-bottom: 20px
+  .el-alert__content
+    padding-left: 16px
+  .el-alert__description
+    margin: 5px 0
+
+.el-table
+  .cell
+    padding: 6px 18px
 </style>
