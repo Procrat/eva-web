@@ -1,7 +1,5 @@
 <template>
   <div id="app">
-    <div>{{ pseudoFlash }}</div>
-
     <el-row :gutter="15">
       <el-col id="sidebar" :span="5">
         <el-card>
@@ -250,7 +248,6 @@ export default {
       deadlineTime: '',
       durationMinutes: '',
       importance: 5,
-      pseudoFlash: '',
       schedule: [],
       loading: true,
       scheduleError: '',
@@ -281,9 +278,9 @@ export default {
       };
       let result = this.api.addTask(task);
       if (result != null) {
-        this.pseudoFlash = result.error;
+        this.$message.error(result.error);
       } else {
-        this.pseudoFlash = "Task added!";
+        this.$message.success("Task added!");
         this.content = '';
         this.deadlineDate = '';
         this.deadlineTime = '';
@@ -335,9 +332,9 @@ export default {
     remove(id) {
       let result = this.api.removeTask(id);
       if (result != null) {
-        this.pseudoFlash = result.error;
+        this.$message.error(result.error);
       } else {
-        this.pseudoFlash = '';
+        this.$message.success("Task removed!");
       }
       this.reschedule();
     },
