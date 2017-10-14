@@ -3,7 +3,7 @@
     <div>{{ pseudoFlash }}</div>
 
     <el-row :gutter="15">
-      <el-col id="sidebar" :span="4">
+      <el-col id="sidebar" :span="5">
         <el-card>
           <el-form class="add-task-form">
             <el-form-item>
@@ -12,15 +12,15 @@
                 />
             </el-form-item>
             <el-form-item>
-              <el-row :gutter="5">
-                <el-col :span="12">
+              <el-row type="flex" :gutter="5" class="deadline">
+                <el-col>
                   <el-date-picker v-model="deadlineDate"
                     placeholder="Deadline"
                     format="dd/MM"
                     :picker-options="timePickerOptions"
                     class="deadline-date" />
                 </el-col>
-                <el-col :span="12">
+                <el-col>
                   <el-time-select v-model="deadlineTime"
                     :picker-options="{
                       start: '00:00',
@@ -63,7 +63,7 @@
         </el-card>
       </el-col>
 
-      <el-col :span="20">
+      <el-col :span="19">
         <el-card>
           <div v-if="scheduleError">
             <el-alert
@@ -369,6 +369,13 @@ export default {
 .add-task-form
   .duration, .deadline-date, .deadline-time
     width: 100% !important
+
+  .deadline
+    flex-wrap: wrap
+  .deadline > *
+    flex: 0 0 50%
+    @media (max-width: 1100px)
+      flex: 0 0 100%
 
 .el-alert
   margin-bottom: 20px
