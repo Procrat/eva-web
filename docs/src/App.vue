@@ -116,6 +116,14 @@
               key="schedule"
               v-loading="loading"
               element-loading-text="Forging your schedule...">
+              <div slot="empty">
+                Add your first task and world domination will soon be yours!¹
+                <br><br>
+                <span style="font-size: 10px">
+                  ¹ There is no proven correlation between using Eva and
+                  achieving world domination.
+                </span>
+              </div>
               <el-table-column label="Schedule"
                 align="center"
                 width="140px">
@@ -415,4 +423,7 @@ summary, time, mark, audio, video
 .el-table
   .cell
     padding: 6px 18px
+  .el-table__empty-block
+    min-height: 225px
+
 </style>
