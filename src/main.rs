@@ -28,6 +28,7 @@ mod errors {
     }
 }
 
+#[allow(unused_attributes)]
 #[cfg_attr(target_arch="asmjs", link_args="-s INVOKE_RUN=0")]
 extern {}
 
