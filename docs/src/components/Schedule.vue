@@ -10,7 +10,7 @@
         class="alert"
         />
 
-      <ElTable :data="tasks()">
+      <ElTable :data="tasks">
         <ElTableColumn>
           <template scope="scope">
             {{ scope.row.content }}
@@ -154,6 +154,7 @@ export default {
       schedule: [],
       loading: true,
       scheduleError: '',
+      tasks: [],
     }
   },
 
@@ -188,11 +189,8 @@ export default {
         this.loading = false;
       } else {
         this.scheduleError = result.error;
+        this.tasks = this.$api.listTasks();
       }
-    },
-
-    tasks() {
-      return this.$api.listTasks();
     },
   },
 }
