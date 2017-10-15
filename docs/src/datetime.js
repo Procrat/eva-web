@@ -53,7 +53,7 @@ export function formatDatetime(datetime) {
   } else if (date.getTime() === addDays(today(), 1).getTime()) {
     dateStr = "Tomorrow";
   } else {
-    dateStr = date.getDate() + "/" + date.getMonth();
+    dateStr = date.getDate() + "/" + (date.getMonth() + 1);
   }
 
   let timeStr = datetime.getHours() + ":"
