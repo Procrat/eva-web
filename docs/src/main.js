@@ -12,17 +12,19 @@ import Api from './api'
 Vue.use(ElementUI, { locale });
 Vue.use(VueConstants);
 
-Api().then(api =>
+Api().then(api => {
+  Vue.use({
+    install(Vue, _options) {
+      Vue.prototype.$api = api;
+    }
+  });
+
   new Vue({
     el: '#app',
-    render (h) {
-      return h(App, {
-        props: {
-          api: api,
-        },
-      });
+    render(h) {
+      return h(App);
     },
   })
-).catch(reason =>
+}).catch(reason =>
   console.error("Loading API failed:", reason)
 );
