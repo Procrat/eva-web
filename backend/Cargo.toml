@@ -7,6 +7,7 @@ authors = ["Stijn Seghers <stijnseghers@gmail.com>"]
 chrono = { version = "0.4", features = ["serde"] }
 error-chain = "0.10"
 eva = { git = "https://github.com/Procrat/eva", branch = "web-integration" }
+libsqlite3-sys = { version = "0.8.1", features = ["bundled"] }
 serde = "1.0"
 serde_derive = "1.0"
 serde_json = "1.0"

@@ -1,4 +1,4 @@
-# Web interface for [Eva](https://github.com/Procrat/eva)
+# Web interface for [Eva](https://github.com/Procrat/eva)  [![Build Status](https://travis-ci.org/Procrat/eva-web.svg?branch=master)](https://travis-ci.org/Procrat/eva-web)
 
 > Let algorithms decide your life.
 
@@ -20,7 +20,8 @@ This project is made up of two parts:
   that interfaces with non-Rust languages using JSON messages. The root of this
   part is in `backend`.
 - a [Vue.js](https://vuejs.org/) front-end that interacts with an
-  [asm.js](http://asmjs.org/) build of the Rust wrapper.
+  [asm.js](http://asmjs.org/)/[Emscripten](http://emscripten.org) build of the
+  Rust wrapper.
 
 If you haven't built a Rust project before, install
 [rustup](https://www.rustup.rs), and run `rustup install nightly` to install the
@@ -29,9 +30,17 @@ latest nightly version of Rust.
 If you haven't run a JavaScript project before, install
 [npm](https://www.npmjs.com/).
 
+Install [Emscripten](http://emscripten.org) either through your system package
+manager or with
+[emsdk](https://kripken.github.io/emscripten-site/docs/getting_started/downloads.html).
+Also ensure that you have the sqlite3 headers installed.
+
 ``` bash
 # Install npm dependencies once
 npm install
+
+# Add the Emscripten target once
+rustup target add asmjs-unknown-emscripten
 
 # Ensure that we have an asm.js build of the Rust wrapper in the right place,
 # and run a development server with hot reloading at localhost:8080

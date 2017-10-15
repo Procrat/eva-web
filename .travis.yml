@@ -1,0 +1,25 @@
+sudo: required
+
+services:
+  - docker
+
+language: generic
+
+install:
+  - docker build -t with-deps .
+  - container=$(docker run -d -t with-deps)
+
+script:
+  - docker exec "$container" make test
+
+before_deploy:
+  - docker exec "$container" make release
+  - docker cp "${container}:/src/eva-web/" .
+  - cd eva-web
+
+deploy:
+  provider: pages
+  github_token: $GITHUB_TOKEN
+  skip_cleanup: true
+  on:
+    branch: master
