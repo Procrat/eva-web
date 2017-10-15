@@ -16,12 +16,11 @@ useful however, so maybe you do too!
 ## Build your own Eva web UI
 
 This project is made up of two parts:
-- a small wrapper in Rust around the
-[eva](https://github.com/Procrat/eva) crate that interfaces with non-Rust
-languages using JSON messages, and
+- a small wrapper in Rust around the [eva](https://github.com/Procrat/eva) crate
+  that interfaces with non-Rust languages using JSON messages. The root of this
+  part is in `backend`.
 - a [Vue.js](https://vuejs.org/) front-end that interacts with an
-  [asm.js](http://asmjs.org/) build of the Rust wrapper. The root of this part
-  is in the `/docs` folder.
+  [asm.js](http://asmjs.org/) build of the Rust wrapper.
 
 If you haven't built a Rust project before, install
 [rustup](https://www.rustup.rs), and run `rustup install nightly` to install the
@@ -32,7 +31,7 @@ If you haven't run a JavaScript project before, install
 
 ``` bash
 # Install npm dependencies once
-(cd docs/ && npm install)
+npm install
 
 # Ensure that we have an asm.js build of the Rust wrapper in the right place,
 # and run a development server with hot reloading at localhost:8080

@@ -6,11 +6,11 @@ OUTPUT=backend.js
 all: debug
 
 debug:
-	cargo build --target=$(TARGET)
-	cp target/$(TARGET)/debug/$(GENERATED) docs/dist/$(OUTPUT)
-	cd docs && npm run dev
+	(cd backend/ && cargo build --target=$(TARGET))
+	cp backend/target/$(TARGET)/debug/$(GENERATED) dist/$(OUTPUT)
+	npm run dev
 
 release:
-	cargo build --target=$(TARGET) --release
-	cp ./target/$(TARGET)/release/$(GENERATED) ./docs/dist/$(OUTPUT)
-	cd docs && npm run build
+	(cd backend/ && cargo build --target=$(TARGET) --release)
+	cp backend/target/$(TARGET)/release/$(GENERATED) dist/$(OUTPUT)
+	npm run build
