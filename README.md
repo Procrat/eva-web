@@ -33,14 +33,14 @@ If you haven't run a JavaScript project before, install
 Install [Emscripten](http://emscripten.org) either through your system package
 manager or with
 [emsdk](https://kripken.github.io/emscripten-site/docs/getting_started/downloads.html).
-Also ensure that you have the sqlite3 headers installed.
+
+Alternatively, run the
+[procrat/rust-asmjs](https://hub.docker.com/r/procrat/rust-asmjs/) Docker image
+which includes all these dependencies.
 
 ``` bash
-# Install npm dependencies once
-npm install
-
-# Add the Emscripten target once
-rustup target add asmjs-unknown-emscripten
+# Install the Rust and JavaScript dependencies once
+make dependencies
 
 # Ensure that we have an asm.js build of the Rust wrapper in the right place,
 # and run a development server with hot reloading at localhost:8080
