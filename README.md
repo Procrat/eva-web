@@ -3,14 +3,14 @@
 > Let algorithms decide your life.
 
 
-## [DEMO TIME](https://procrat.github.io/eva-web)
-
-
 ## Disclaimer: work in progress
 
 This project hasn't reached an alpha state yet. At the moment, it is just a tiny
 CLI wrapper around a simple scheduling algorithm. Some people already find this
 useful however, so maybe you do too!
+
+
+## [Quick demo](https://procrat.github.io/eva-web)
 
 
 ## Build your own Eva web UI
