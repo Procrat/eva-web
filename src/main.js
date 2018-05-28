@@ -1,30 +1,70 @@
-import Vue from 'vue'
-import VueConstants from 'vue-constants'
+import Vue from 'vue';
+import VueConstants from 'vue-constants';
 
-import ElementUI from 'element-ui'
-import 'element-ui/lib/theme-default/index.css'
-import locale from 'element-ui/lib/locale/lang/en'
+import {
+  Alert,
+  Button,
+  Card,
+  Col,
+  DatePicker,
+  Form,
+  FormItem,
+  Input,
+  Loading,
+  Message,
+  Option,
+  Row,
+  Select,
+  Slider,
+  Table,
+  TableColumn,
+  TimeSelect,
+} from 'element-ui';
+import 'element-ui/lib/theme-default/index.css';
+import locale from 'element-ui/lib/locale';
+import english from 'element-ui/lib/locale/lang/en';
 
-import App from './App.vue'
-import Api from './api'
+import App from '@/App.vue';
+import Api from '@/api';
+import error500 from '@/error-500';
 
+locale.use(english);
 
-Vue.use(ElementUI, { locale });
+Vue.use(Alert);
+Vue.use(Button);
+Vue.use(Card);
+Vue.use(Col);
+Vue.use(DatePicker);
+Vue.use(Form);
+Vue.use(FormItem);
+Vue.use(Input);
+Vue.use(Option);
+Vue.use(Row);
+Vue.use(Select);
+Vue.use(Slider);
+Vue.use(Table);
+Vue.use(TableColumn);
+Vue.use(TimeSelect);
+Vue.use(Loading.directive);
+Vue.prototype.$loading = Loading.service;
+Vue.prototype.$message = Message;
+
 Vue.use(VueConstants);
 
-Api().then(api => {
+Vue.config.productionTip = false;
+
+
+const body = document.getElementsByTagName('body')[0];
+body.insertAdjacentHTML('afterbegin', '<div id="app"></div>');
+
+Api().then((api) => {
   Vue.use({
-    install(Vue, _options) {
-      Vue.prototype.$api = api;
-    }
+    install(vue, _options) {
+      vue.prototype.$api = api;
+    },
   });
 
-  new Vue({
-    el: '#app',
-    render(h) {
-      return h(App);
-    },
-  })
-}).catch(reason =>
-  console.error("Loading API failed:", reason)
-);
+  const vm = new Vue({ render: h => h(App) });
+
+  vm.$mount('#app');
+}).catch(reason => error500(reason));

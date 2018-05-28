@@ -1,0 +1,5 @@
+# https://EditorConfig.org
+# Inherits from .editorconfig in the project root
+
+[*]
+indent_size = 4

@@ -1,25 +1,55 @@
-sudo: required
+language: rust
+rust: nightly
+cache:
+  - cargo: true
+  - directories:
+    - $HOME/.rustup
+    - node_modules
 
-services:
-  - docker
 
-language: generic
+# Install same version of wasm-bindgen-cli as of wasm-bindgen in Cargo.lock
+INSTALL_WASM_BINDGEN_CLI: &INSTALL_WASM_BINDGEN_CLI
+  |
+    wanted_version=$(sed -n '/^name = "wasm-bindgen"$/{N;s/.*\nversion = "\(.*\)"$/\1/p}' backend/Cargo.lock)
+    if ! which wasm-bindgen &>/dev/null; then
+      should_install=true
+    else
+      current_version=$(wasm-bindgen --version | cut -d' ' -f2)
+      if [ "$wanted_version" != "$current_version" ]; then
+        should_install=true
+      fi
+    fi
+    if [ -n "$should_install" ]; then
+      cargo install --version "$wanted_version" wasm-bindgen-cli
+    fi
 
 install:
-  - docker build -t with-deps .
-  - container=$(docker run -d -t with-deps)
+  - nvm install v10.13
+  - *INSTALL_WASM_BINDGEN_CLI
+  - make dependencies
+
 
 script:
-  - docker exec "$container" make test
+  - make test
+
 
 before_deploy:
-  - docker exec "$container" make release
-  - docker cp "${container}:/src/eva-web/" .
-  - cd eva-web
+  - make release
+  - curl -sSfL 'https://cli.netlify.com/download/latest/linux' | tar xz
 
 deploy:
-  provider: pages
-  github_token: $GITHUB_TOKEN
-  skip_cleanup: true
-  on:
-    branch: master
+  - provider: script
+    script: >
+      ./netlifyctl deploy
+      --site-id "$NETLIFY_SITE_ID"
+      --access-token "$NETLIFY_ACCESS_TOKEN"
+      $([ "$TRAVIS_BRANCH" != master ] && echo --draft)
+      --message "$TRAVIS_BRANCH"
+      --publish-directory ./dist ||
+      cat netlifyctl-debug.log
+    skip_cleanup: true
+    on:
+      all_branches: true
+  - provider: pages
+    github_token: $GITHUB_TOKEN
+    skip_cleanup: true

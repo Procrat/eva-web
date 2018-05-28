@@ -1,16 +1,22 @@
 <template>
   <div id="app">
     <ElRow class="logo">
-      <img src="src/assets/logo.png"/>
+      <img src="@/assets/logo.png">
     </ElRow>
 
-    <ElRow :gutter="20" class="content">
-      <ElCol id="sidebar" :span="5">
-        <TaskAddForm :bus="bus"/>
+    <ElRow
+      :gutter="20"
+      class="content"
+    >
+      <ElCol
+        id="sidebar"
+        :span="5"
+      >
+        <TaskAddForm :bus="bus" />
       </ElCol>
 
       <ElCol :span="19">
-        <Schedule :bus="bus"/>
+        <Schedule :bus="bus" />
       </ElCol>
     </ElRow>
   </div>
@@ -33,8 +39,8 @@ export default {
 
   constants: {
     bus: new Vue(),
-  }
-}
+  },
+};
 </script>
 
 
@@ -54,7 +60,9 @@ center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption,
 tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed,
 figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section,
 summary, time, mark, audio, video
-  font-family: "Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑",Arial,sans-serif
+  font-family: "Helvetica Neue", Helvetica,
+    "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑",
+    Arial, sans-serif
 
 .logo
   margin: 20px
