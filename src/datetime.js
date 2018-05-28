@@ -1,7 +1,9 @@
 function stripTime(datetime) {
-  return new Date(datetime.getFullYear(),
-                  datetime.getMonth(),
-                  datetime.getDate());
+  return new Date(
+    datetime.getFullYear(),
+    datetime.getMonth(),
+    datetime.getDate(),
+  );
 }
 
 export function today() {
@@ -19,8 +21,8 @@ export function tomorrow() {
 
 export function nextDayOfWeek(dayOfWeek) {
   // Weeks should start on Monday: 0 = Monday; 6 = Sunday
-  let currentWeekDay = (today().getDay() + 6) % 7;
-  let wantedWeekDay = today();
+  const currentWeekDay = (today().getDay() + 6) % 7;
+  const wantedWeekDay = today();
   wantedWeekDay.setDate(today().getDate() + (dayOfWeek - currentWeekDay));
   return wantedWeekDay;
 }
@@ -30,7 +32,7 @@ export function inNDays(n) {
 }
 
 export function lastDayOfMonth() {
-  let lastDay = today();
+  const lastDay = today();
   lastDay.setMonth(lastDay.getMonth() + 1, 0);
   return lastDay;
 }
@@ -46,35 +48,34 @@ export function inNMonths(n) {
 
 
 export function formatDatetime(datetime) {
-  let date = stripTime(datetime);
+  const date = stripTime(datetime);
   let dateStr;
   if (date.getTime() === today().getTime()) {
-    dateStr = "";
+    dateStr = '';
   } else if (date.getTime() === addDays(today(), 1).getTime()) {
-    dateStr = "Tomorrow";
+    dateStr = 'Tomorrow';
   } else {
-    dateStr = date.getDate() + "/" + (date.getMonth() + 1);
+    dateStr = `${date.getDate()}/${date.getMonth() + 1}`;
   }
 
-  let timeStr = datetime.getHours() + ":"
-    + datetime.getMinutes().toString().padStart(2, "0");
-  if (timeStr == "23:59") {
-    timeStr = "";
+  let timeStr = `${datetime.getHours()}:`
+    + `${datetime.getMinutes().toString().padStart(2, '0')}`;
+  if (timeStr === '23:59') {
+    timeStr = '';
   }
 
-  let datetimeStr = [dateStr, timeStr].join(" ").trim();
-  if (datetimeStr == "") {
-    datetimeStr = "Today";
+  let datetimeStr = [dateStr, timeStr].join(' ').trim();
+  if (datetimeStr === '') {
+    datetimeStr = 'Today';
   }
   return datetimeStr;
 }
 
 export function formatDuration(durationMinutes) {
-  let hours = Math.floor(durationMinutes / 60);
-  let minutes = durationMinutes % 60;
+  const hours = Math.floor(durationMinutes / 60);
+  const minutes = durationMinutes % 60;
   if (hours > 0) {
-    return hours + "h" + (minutes == 0 ? "" : minutes);
-  } else {
-    return minutes + "m";
+    return `${hours}h${minutes === 0 ? '' : minutes}`;
   }
+  return `${minutes}m`;
 }

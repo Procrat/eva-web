@@ -1,57 +1,50 @@
-export default function() {
-  FS.mkdir("/indexed_db");
-  FS.mount(IDBFS, {}, "/indexed_db");
-  var idbPromise = new Promise((resolve, reject) => {
-    FS.syncfs(true, (err) => {
-      if (err == null) {
-        resolve();
-      } else {
-        console.error("Could not load IndexedDB:", err);
-        reject(err);
-      }
-    });
-  });
+const API = import('@backend/eva.js');
 
-  return idbPromise.then(() => ({
 
-    addTask: function(task) {
-      let result = Module.ccall('add_task', 'string', ['string'], [JSON.stringify(task)]);
-      FS.syncfs(false, (err) => {
-        console.assert(err == null, "Could not sync IndexedDB:", err);
-      });
-      return JSON.parse(result);
+function parseDate(timestamp) {
+  return new Date(Date.parse(timestamp));
+}
+
+
+function parseTask(task) {
+  return {
+    ...task,
+    deadline: parseDate(task.deadline),
+  };
+}
+
+
+function jsApi(wasmApi) {
+  wasmApi.initialize();
+
+  return {
+    addTask(task) {
+      return wasmApi.add_task(task)
+        .then(addedTask => parseTask(addedTask));
     },
 
-    listTasks: function() {
-      let result = Module.ccall('list_tasks', 'string', [], []);
-      let parsed = JSON.parse(result);
-      if (parsed != null && parsed.error == null) {
-        parsed.forEach(task => {
-          task.deadline = new Date(Date.parse(task.deadline));
-        });
-      }
-      return parsed;
+    removeTask(id) {
+      return wasmApi.remove_task(id);
     },
 
-    removeTask: function(id) {
-      let result = Module.ccall('remove_task', 'string', ['number'], [id]);
-      FS.syncfs(false, (err) => {
-        console.assert(err == null, "Could not sync IndexedDB:", err);
-      });
-      return JSON.parse(result);
+    listTasks() {
+      return wasmApi.list_tasks()
+        .then(result => result.map(parseTask));
     },
 
-    schedule: function() {
-      let result = Module.ccall('schedule', 'string', [], []);
-      let parsed = JSON.parse(result);
-      if (parsed != null && parsed.error == null) {
-        parsed.forEach(scheduled_task => {
-          scheduled_task.when = new Date(Date.parse(scheduled_task.when));
-          scheduled_task.task.deadline = new Date(Date.parse(scheduled_task.task.deadline));
-        });
-      }
-      return parsed;
+    schedule() {
+      return wasmApi.schedule()
+        .then(result => result.map(scheduledTask => ({
+          when: parseDate(scheduledTask.when),
+          task: parseTask(scheduledTask.task),
+        })));
     },
+  };
+}
 
-  }));
-};
+
+export default async function () {
+  return API
+    .then(jsApi)
+    .catch(console.error);
+}

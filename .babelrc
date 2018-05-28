@@ -1,5 +1,19 @@
 {
   "presets": [
-    ["env", { "modules": false }]
-  ]
+    ["@babel/preset-env", {
+      "useBuiltIns": "usage"
+    }]
+  ],
+  "plugins": [
+    "@babel/plugin-syntax-dynamic-import",
+    ["component", {
+      "libraryName": "element-ui",
+      "styleLibraryName": "theme-default"
+    }]
+  ],
+  "env": {
+    "test": {
+      "plugins": ["istanbul"]
+    }
+  }
 }

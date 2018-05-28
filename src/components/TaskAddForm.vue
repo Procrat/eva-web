@@ -2,58 +2,75 @@
   <ElCard>
     <ElForm class="add-task-form">
       <ElFormItem>
-        <ElInput v-model="content"
+        <ElInput
+          v-model="content"
           placeholder="What do you want to do?"
-          />
+        />
       </ElFormItem>
 
       <ElFormItem>
-        <ElRow type="flex" :gutter="5" class="deadline">
+        <ElRow
+          :gutter="5"
+          type="flex"
+          class="deadline"
+        >
           <ElCol>
-            <ElDatePicker v-model="deadlineDate"
+            <ElDatePicker
+              v-model="deadlineDate"
+              :picker-options="timePickerOptions"
               placeholder="Deadline"
               format="dd/MM"
-              :picker-options="timePickerOptions"
-              class="deadline-date" />
+              class="deadline-date"
+            />
           </ElCol>
           <ElCol>
-            <ElTimeSelect v-model="deadlineTime"
+            <ElTimeSelect
+              v-model="deadlineTime"
               :picker-options="{
-              start: '00:00',
-              step: '00:30',
-              end: '23:59'
+                start: '00:00',
+                step: '00:30',
+                end: '23:59'
               }"
               class="deadline-time"
-              />
+            />
           </ElCol>
         </ElRow>
       </ElFormItem>
 
       <ElFormItem>
-        <ElSelect v-model="durationMinutes"
+        <ElSelect
+          v-model="durationMinutes"
           filterable
           default-first-option
           placeholder="Duration"
           class="duration"
-          >
-          <ElOption v-for="option in durationOptions"
+        >
+          <ElOption
+            v-for="option in durationOptions"
             :key="option.minutes"
             :label="option.stringified"
             :value="option.minutes"
-            />
+          />
         </ElSelect>
       </ElFormItem>
 
       <ElFormItem>
-        <ElSlider v-model="importance"
+        <ElSlider
+          v-model="importance"
           :min="0"
           :max="10"
           :format-tooltip="formatImportance"
-          />
+        />
       </ElFormItem>
 
-      <ElRow type="flex" justify="center">
-        <ElButton @click="addTask" type="primary">
+      <ElRow
+        type="flex"
+        justify="center"
+      >
+        <ElButton
+          type="primary"
+          @click="addTask"
+        >
           Let's do this!
         </ElButton>
       </ElRow>
@@ -68,17 +85,22 @@ import * as DateTime from '@/datetime';
 export default {
   name: 'TaskAddForm',
 
-  props: ['bus'],
+  props: {
+    bus: {
+      type: Object,
+      required: true,
+    },
+  },
 
   constants: {
     durationOptions: [
-      {minutes: 2, stringified: '2 minutes'},
-      {minutes: 5, stringified: '5 minutes'},
-      {minutes: 10, stringified: '10 minutes'},
-      {minutes: 15, stringified: '15 minutes'},
-      {minutes: 30, stringified: '30 minutes'},
-      {minutes: 60, stringified: '1 hour'},
-      {minutes: 120, stringified: '2 hours'},
+      { minutes: 2, stringified: '2 minutes' },
+      { minutes: 5, stringified: '5 minutes' },
+      { minutes: 10, stringified: '10 minutes' },
+      { minutes: 15, stringified: '15 minutes' },
+      { minutes: 30, stringified: '30 minutes' },
+      { minutes: 60, stringified: '1 hour' },
+      { minutes: 120, stringified: '2 hours' },
     ],
 
     timePickerOptions: {
@@ -91,39 +113,39 @@ export default {
           text: 'Today',
           onClick(picker) {
             picker.$emit('pick', DateTime.today());
-          }
+          },
         }, {
           text: 'Tomorrow',
           onClick(picker) {
             picker.$emit('pick', DateTime.tomorrow());
-          }
+          },
         }, {
           text: 'This week',
           onClick(picker) {
             picker.$emit('pick', DateTime.nextDayOfWeek(6));
-          }
+          },
         }, {
           text: '+1 week',
           onClick(picker) {
             picker.$emit('pick', DateTime.inNDays(7));
-          }
+          },
         }, {
           text: '+2 weeks',
           onClick(picker) {
             picker.$emit('pick', DateTime.inNDays(14));
-          }
+          },
         }, {
           text: 'This month',
           onClick(picker) {
             picker.$emit('pick', DateTime.lastDayOfMonth());
-          }
+          },
         }, {
           text: '+1 month',
           onClick(picker) {
             picker.$emit('pick', DateTime.inNMonths(1));
-          }
-        }
-      ]
+          },
+        },
+      ],
     },
   },
 
@@ -134,56 +156,65 @@ export default {
       deadlineTime: '',
       durationMinutes: '',
       importance: 5,
-    }
+    };
   },
 
   methods: {
-    addTask(event) {
-      // TODO replace this poor man's validation
-      assert(this.content, 'No task given');
-      assert(this.deadlineDate || this.deadlineTime, 'No deadline given');
-      assert(this.durationMinutes, 'No duration given');
+    addTask() {
+      if (!this.content) {
+        this.$message.error('You didn\'t say what it is you want to achieve.');
+        return;
+      }
+      if (!this.deadlineDate && !this.deadlineTime) {
+        this.$message.error('You didn\'t mention when it\'s due.');
+        return;
+      }
+      if (!this.durationMinutes) {
+        this.$message.error('You didn\'t mention how long you think it would take.');
+        return;
+      }
 
-      let deadline = this.deadlineDate || DateTime.today();
-      let deadlineTime = (this.deadlineTime || '23:59')
+      const deadline = this.deadlineDate || DateTime.today();
+      const deadlineTime = (this.deadlineTime || '23:59')
         .split(':')
-        .map((value) => parseInt(value));
+        .map(value => parseInt(value, 10));
       deadline.setHours(deadlineTime[0], deadlineTime[1]);
-      assert(deadline > new Date(), 'Deadline is in the past');
+      if (!(deadline > new Date())) {
+        this.$message.error('The deadline you specified is in the past.');
+        return;
+      }
 
-      let task = {
+      const task = {
         content: this.content,
-        deadline: deadline,
+        deadline,
         duration_minutes: this.durationMinutes,
-        importance: parseInt(this.importance),
+        importance: parseInt(this.importance, 10),
       };
 
-      let result = this.$api.addTask(task);
+      this.$api.addTask(task)
+        .then((_addedTask) => {
+          this.$message.success('Task added!');
 
-      if (result != null) {
-        this.$message.error(result.error);
-      } else {
-        this.$message.success('Task added!');
+          this.content = '';
+          this.deadlineDate = '';
+          this.deadlineTime = '';
+          this.durationMinutes = '';
+          this.importance = 5;
 
-        this.content = '';
-        this.deadlineDate = '';
-        this.deadlineTime = '';
-        this.durationMinutes = '';
-        this.importance = 5;
-
-        this.bus.$emit('task-added');
-      }
+          this.bus.$emit('task-added');
+        })
+        .catch(error => this.$message.error(error));
     },
 
     formatImportance(importance) {
-      return 'Importance: ' + importance;
+      return `Importance: ${importance}`;
     },
   },
-}
+};
 </script>
 
 
-<style scoped lang="sass">
+<style lang="sass" scoped>
 .add-task-form
   .duration, .deadline-date, .deadline-time
     width: 100% !important
