@@ -187,8 +187,9 @@ export default {
       const task = {
         content: this.content,
         deadline,
-        duration_minutes: this.durationMinutes,
+        duration: this.durationMinutes * 60,
         importance: parseInt(this.importance, 10),
+        time_segment_id: 0,
       };
 
       this.$api.addTask(task)

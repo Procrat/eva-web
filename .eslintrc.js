@@ -29,6 +29,8 @@ module.exports = {
     }],
     // Allow _xxx for unused arguments
     'no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
+    // Allow some dangling underscores that PouchDB uses
+    'no-underscore-dangle': ['error', { allow: ['_id', '_rev']}],
     // Allow imported things to be listed in dev dependencies as well
     'import/no-extraneous-dependencies': ['error', { devDependencies: true }],
   },

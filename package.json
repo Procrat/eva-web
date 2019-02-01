@@ -15,6 +15,7 @@
   "dependencies": {
     "element-ui": "^1.4.13",
     "pouchdb": "^7.0.0",
+    "pouchdb-find": "^7.0.0",
     "vue": "^2.6.8",
     "vue-constants": "^1.0.3"
   },

@@ -71,9 +71,9 @@ export function formatDatetime(datetime) {
   return datetimeStr;
 }
 
-export function formatDuration(durationMinutes) {
-  const hours = Math.floor(durationMinutes / 60);
-  const minutes = durationMinutes % 60;
+export function formatDuration(durationSeconds) {
+  const hours = Math.floor(durationSeconds / 3600);
+  const minutes = Math.floor(durationSeconds / 60) % 60;
   if (hours > 0) {
     return `${hours}h${minutes === 0 ? '' : minutes}`;
   }

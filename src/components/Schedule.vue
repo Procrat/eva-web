@@ -36,7 +36,7 @@
           width="100px"
         >
           <template slot-scope="{ row }">
-            {{ row.duration_minutes | formatDuration }}
+            {{ row.duration | formatDuration }}
           </template>
         </ElTableColumn>
 
@@ -118,7 +118,7 @@
           width="100px"
         >
           <template slot-scope="{ row }">
-            {{ row.task.duration_minutes | formatDuration }}
+            {{ row.task.duration | formatDuration }}
           </template>
         </ElTableColumn>
 

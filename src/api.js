@@ -18,26 +18,26 @@ function jsApi(wasmApi) {
   wasmApi.initialize();
 
   return {
-    addTask(task) {
-      return wasmApi.add_task(task)
-        .then(addedTask => parseTask(addedTask));
+    async addTask(task) {
+      const addedTask = await wasmApi.add_task(task);
+      return parseTask(addedTask);
     },
 
-    removeTask(id) {
+    async removeTask(id) {
       return wasmApi.remove_task(id);
     },
 
-    listTasks() {
-      return wasmApi.list_tasks()
-        .then(result => result.map(parseTask));
+    async listTasks() {
+      const tasks = await wasmApi.list_tasks();
+      return tasks.map(parseTask);
     },
 
-    schedule() {
-      return wasmApi.schedule()
-        .then(result => result.map(scheduledTask => ({
-          when: parseDate(scheduledTask.when),
-          task: parseTask(scheduledTask.task),
-        })));
+    async schedule() {
+      const scheduledTasks = await wasmApi.schedule();
+      return scheduledTasks.map(scheduledTask => ({
+        when: parseDate(scheduledTask.when),
+        task: parseTask(scheduledTask.task),
+      }));
     },
   };
 }
