@@ -1,151 +1,128 @@
-use chrono::Duration;
-use chrono::prelude::*;
-use eva::errors::*;
+use eva::database::{Database as DatabaseT, Error, Result};
+use eva::time_segment::NamedTimeSegment as TimeSegment;
 use futures::compat::Future01CompatExt;
 use futures::future::LocalFutureObj;
 use js_sys::Promise;
-use serde_derive::Deserialize;
-use serde_json::json;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
 use wasm_bindgen_futures::JsFuture;
 
+use crate::serde;
 
-pub fn database() -> impl eva::database::Database {
-    PouchDB::new("tasks")
+macro_rules! js_await {
+    ($promise:expr) => {
+        await!(JsFuture::from($promise).compat()).map_err(|error| parse_error(error))
+    };
 }
 
-
-#[wasm_bindgen(module = "./../../src/pouchdb")]
-pub extern {
-    pub type PouchDB;
-
-    #[wasm_bindgen(constructor)]
-    pub fn new(database_name: &str) -> PouchDB;
-
-    #[wasm_bindgen(method)]
-    pub fn put(database: &PouchDB, object: JsValue) -> Promise;
-
-    #[wasm_bindgen(method)]
-    pub fn get(database: &PouchDB, id: String) -> Promise;
-
-    #[wasm_bindgen(method)]
-    pub fn remove(database: &PouchDB, doc: JsValue) -> Promise;
-
-    #[wasm_bindgen(method)]
-    pub fn allDocs(datbase: &PouchDB, options: JsValue) -> Promise;
+pub async fn database() -> crate::Result<impl DatabaseT> {
+    let result = js_await!(Database::open())
+        .map_err(|e| crate::Error::Database("while opening the database", e))?;
+    Ok(Database::from(result))
 }
 
+#[wasm_bindgen(module = "./../../src/database")]
+extern "C" {
+    pub type Database;
 
-impl eva::database::Database for PouchDB {
-    fn add_task<'a: 'b, 'b>(&'a self, task: eva::NewTask) -> LocalFutureObj<'b, eva::Result<eva::Task>> {
-        let id: u32 = rand::random();
-        let db_task = json!({
-            "_id": format!("{}", id),
-            "content": task.content,
-            "deadline": task.deadline.timestamp(),
-            "duration": task.duration.num_seconds(),
-            "importance": task.importance,
-        });
+    #[wasm_bindgen(static_method_of = Database)]
+    pub fn open() -> Promise;
+
+    #[wasm_bindgen(method)]
+    pub fn put(database: &Database, id: u32, type_: String, document: JsValue) -> Promise;
+
+    #[wasm_bindgen(method)]
+    pub fn get(database: &Database, id: String) -> Promise;
+
+    #[wasm_bindgen(method)]
+    pub fn remove(database: &Database, document: JsValue) -> Promise;
+
+    #[wasm_bindgen(method)]
+    pub fn allTasks(database: &Database) -> Promise;
+
+    #[wasm_bindgen(method)]
+    pub fn allTasksPerTimeSegment(database: &Database) -> Promise;
+}
+
+impl DatabaseT for Database {
+    fn add_task<'a: 'b, 'b>(&'a self, task: eva::NewTask) -> LocalFutureObj<'b, Result<eva::Task>> {
+        // Due to a bug in wasm-bindgen, u32s larger than 2**31 turn negative in JS
+        let id = rand::random::<u32>() % 2u32.pow(31);
         let future = async move {
-            let serialised_task = JsValue::from_serde(&db_task)
-                .chain_err(|| ErrorKind::Database(
-                    "while trying to serialise a task".into()))?;
-            let result = await!(JsFuture::from(self.put(serialised_task)).compat())
-                .map_err(|error| chained_database_error(error, "while trying to save a task"))?;
-            if get_property_unsafe(&result, "ok") != JsValue::TRUE {
-                return Err(chained_database_error(result, "while trying to save a task"));
-            }
+            let serialised_task = JsValue::from_serde(&serde::NewTaskWrapper(task.clone()))
+                .map_err(|e| Error("while serialising a task", e.into()))?;
+            let _result = js_await!(self.put(id, "task".into(), serialised_task))
+                .map_err(|e| Error("while saving a task", e))?;
             Ok(eva::Task {
-                id: id,
+                id,
                 content: task.content,
                 deadline: task.deadline,
                 duration: task.duration,
                 importance: task.importance,
+                time_segment_id: task.time_segment_id,
             })
         };
         LocalFutureObj::new(Box::new(future))
     }
 
-    fn remove_task<'a: 'b, 'b>(&'a self, id: u32) -> LocalFutureObj<'b, eva::Result<()>> {
+    fn remove_task<'a: 'b, 'b>(&'a self, id: u32) -> LocalFutureObj<'b, Result<()>> {
         let future = async move {
-            let doc = await!(JsFuture::from(self.get(format!("{}", id))).compat())
-                .map_err(|error| chained_database_error(error, "while trying to remove a task"))?;
-            let _result = await!(JsFuture::from(self.remove(doc)).compat())
-                .map_err(|error| chained_database_error(error, "while trying to remove a task"))?;
+            let document = js_await!(self.get(format!("{}", id)))
+                .map_err(|e| Error("while removing a task", e))?;
+            let _result =
+                js_await!(self.remove(document)).map_err(|e| Error("while removing a task", e))?;
             Ok(())
         };
         LocalFutureObj::new(Box::new(future))
     }
 
-    fn find_task<'a: 'b, 'b>(&'a self, _id: u32) -> LocalFutureObj<'b, eva::Result<eva::Task>> {
+    fn find_task<'a: 'b, 'b>(&'a self, _id: u32) -> LocalFutureObj<'b, Result<eva::Task>> {
         unimplemented!()
     }
 
-    fn update_task<'a: 'b, 'b>(&'a self, _task: eva::Task) -> LocalFutureObj<'b, eva::Result<()>> {
+    fn update_task<'a: 'b, 'b>(&'a self, _task: eva::Task) -> LocalFutureObj<'b, Result<()>> {
         unimplemented!()
     }
 
-    fn all_tasks<'a: 'b, 'b>(&'a self) -> LocalFutureObj<'b, eva::Result<Vec<eva::Task>>> {
-        let options = json!({
-            "include_docs": true,
-        });
-        let serialised_options =
-            JsValue::from_serde(&options)
-            .chain_err(|| ErrorKind::Database(
-                "while trying to talk to the database".into()));
+    fn all_tasks<'a: 'b, 'b>(&'a self) -> LocalFutureObj<'b, Result<Vec<eva::Task>>> {
         let future = async move {
-            let result = await!(JsFuture::from(self.allDocs(serialised_options?)).compat())
-                .map_err(|error| chained_database_error(error, "while trying to load all tasks"))?;
-            let rows: js_sys::Array = get_property_unsafe(&result, "rows").into();
-            let docs: JsValue = rows.map(&mut |row, _, _| get_property_unsafe(&row, "doc")).into();
-            let deserialised_result: Vec<Task> = docs.into_serde()
-                .chain_err(|| ErrorKind::Database(
-                    "while trying to load all tasks".into()))?;
-            Ok(deserialised_result.into_iter()
-               .map(|task: Task| -> eva::Task {
-                   let naive_deadline = NaiveDateTime::from_timestamp(i64::from(task.deadline), 0);
-                   let deadline = Utc.from_utc_datetime(&naive_deadline);
-                   let duration = Duration::seconds(i64::from(task.duration));
-                   eva::Task {
-                       id: task._id.parse::<u32>().unwrap(),
-                       content: task.content,
-                       deadline: deadline,
-                       duration: duration,
-                       importance: task.importance,
-                   }
-               }).collect())
+            let documents =
+                js_await!(self.allTasks()).map_err(|e| Error("while loading all tasks", e))?;
+            Ok(documents
+                .into_serde::<Vec<serde::TaskWrapper>>()
+                .map_err(|e| Error("while deserialising tasks", e.into()))?
+                .into_iter()
+                .map(|t| t.0)
+                .collect())
+        };
+        LocalFutureObj::new(Box::new(future))
+    }
+
+    fn all_tasks_per_time_segment<'a: 'b, 'b>(
+        &'a self,
+    ) -> LocalFutureObj<'b, Result<Vec<(TimeSegment, Vec<eva::Task>)>>> {
+        let future = async move {
+            let documents = js_await!(self.allTasksPerTimeSegment())
+                .map_err(|e| Error("while loading all tasks", e))?;
+            let deserialised_documents: Vec<(serde::TimeSegmentWrapper, Vec<serde::TaskWrapper>)> =
+                documents
+                    .into_serde()
+                    .map_err(|e| Error("while deserialising tasks", e.into()))?;
+            Ok(deserialised_documents
+                .into_iter()
+                .map(|(time_segment, tasks)| {
+                    (time_segment.0, tasks.into_iter().map(|t| t.0).collect())
+                })
+                .collect())
         };
         LocalFutureObj::new(Box::new(future))
     }
 }
 
-
-fn get_property_unsafe(object: &JsValue, property_name: &str) -> JsValue {
-    js_sys::Reflect::get(object, &property_name.into()).unwrap()
-}
-
-
-fn js_to_rust_error(rejection_value: JsValue) -> Error {
-    let error_string: String = rejection_value
+fn parse_error(error: JsValue) -> failure::Error {
+    let error_string: String = error
         .dyn_into::<js_sys::Object>()
         .map(|object| object.to_string().into())
         .unwrap_or("Error was not an object".into());
-    Error::from(ErrorKind::from(error_string))
-}
-
-fn chained_database_error(rejection_value: JsValue, message: &str) -> Error {
-    Error::with_chain(js_to_rust_error(rejection_value),
-                      ErrorKind::Database(message.into()))
-}
-
-
-#[derive(Deserialize)]
-struct Task {
-    _id: String,
-    _rev: String,
-    content: String,
-    deadline: u32,
-    duration: u32,
-    importance: u32,
+    failure::err_msg(error_string)
 }

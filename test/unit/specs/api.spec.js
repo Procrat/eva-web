@@ -16,8 +16,9 @@ function sampleNewTask(overrides) {
   return {
     content: 'some task',
     deadline: sampleDeadline(),
-    duration_minutes: 60,
+    duration: 60 * 60,
     importance: 8,
+    time_segment_id: 0,
     ...overrides,
   };
 }
@@ -56,7 +57,7 @@ describe('api', () => {
 
   describe('#removeTask', () => {
     it('should blow up if the task doesn\'t exist', async function _() {
-      return expect(this.$api.removeTask(0)).to.be.rejected;
+      return expect(this.$api.removeTask(123)).to.be.rejected;
     });
 
     it('should remove a task if it exists', async function _() {

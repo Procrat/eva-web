@@ -16,7 +16,7 @@ debug: debug-wasm
 	npm run dev
 
 debug-wasm: $(FRONTEND_DEBUG_OUTPUT)/eva.js $(FRONTEND_DEBUG_OUTPUT)/eva_bg.wasm
-.PHONY: debug-rust
+.PHONY: debug-wasm
 
 $(BACKEND_DEBUG_OUTPUT)/eva.wasm: backend/src/*.rs backend/Cargo.toml backend/Cargo.lock
 	(cd backend && cargo +$(RUST_CHANNEL) build --target=$(RUST_TARGET))
