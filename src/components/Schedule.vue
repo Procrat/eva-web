@@ -77,7 +77,6 @@
         :data="schedule"
         element-loading-text="Thinking really hard about your schedule..."
       >
-
         <div slot="empty">
           Add your first task and world domination will soon be yours!¹
           <br><br>
