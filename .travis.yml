@@ -51,4 +51,5 @@ deploy:
       all_branches: true
   - provider: pages
     github_token: $GITHUB_TOKEN
+    local_dir: dist
     skip_cleanup: true
