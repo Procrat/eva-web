@@ -36,7 +36,7 @@ describe('api', () => {
 
   afterEach(async () => {
     const db = new PouchDB('tasks');
-    db.destroy();
+    await db.destroy();
   });
 
   describe('#addTask', () => {
