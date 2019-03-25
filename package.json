@@ -16,8 +16,7 @@
     "element-ui": "^1.4.13",
     "pouchdb": "^7.0.0",
     "pouchdb-find": "^7.0.0",
-    "vue": "^2.6.8",
-    "vue-constants": "^1.0.3"
+    "vue": "^2.6.8"
   },
   "devDependencies": {
     "@babel/core": "^7.3.4",
@@ -64,6 +63,8 @@
     "source-map-explorer": "^1.7.0",
     "style-loader": "^0.23.1",
     "terser-webpack-plugin": "^1.2.3",
+    "ts-loader": "^5.3.3",
+    "typescript": "^3.3.4000",
     "vue-loader": "^15.7.0",
     "vue-template-compiler": "^2.6.8",
     "webpack": "^4.29.6",

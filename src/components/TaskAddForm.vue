@@ -80,9 +80,11 @@
 
 
 <script>
+import Vue from 'vue';
 import * as DateTime from '@/datetime';
 
-export default {
+
+export default Vue.extend({
   name: 'TaskAddForm',
 
   props: {
@@ -92,8 +94,18 @@ export default {
     },
   },
 
-  constants: {
-    durationOptions: [
+  data() {
+    return {
+      content: '',
+      deadlineDate: '',
+      deadlineTime: '',
+      durationMinutes: '',
+      importance: 5,
+    };
+  },
+
+  created() {
+    this.durationOptions = [
       { minutes: 2, stringified: '2 minutes' },
       { minutes: 5, stringified: '5 minutes' },
       { minutes: 10, stringified: '10 minutes' },
@@ -101,9 +113,9 @@ export default {
       { minutes: 30, stringified: '30 minutes' },
       { minutes: 60, stringified: '1 hour' },
       { minutes: 120, stringified: '2 hours' },
-    ],
+    ];
 
-    timePickerOptions: {
+    this.timePickerOptions = {
       firstDayOfWeek: 1,
       disabledDate(date) {
         return date < DateTime.today();
@@ -146,16 +158,6 @@ export default {
           },
         },
       ],
-    },
-  },
-
-  data() {
-    return {
-      content: '',
-      deadlineDate: '',
-      deadlineTime: '',
-      durationMinutes: '',
-      importance: 5,
     };
   },
 
@@ -211,7 +213,7 @@ export default {
       return `Importance: ${importance}`;
     },
   },
-};
+});
 </script>
 
 

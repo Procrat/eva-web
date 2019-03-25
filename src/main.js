@@ -1,5 +1,4 @@
 import Vue from 'vue';
-import VueConstants from 'vue-constants';
 
 import {
   Alert,
@@ -48,8 +47,6 @@ Vue.use(TimeSelect);
 Vue.use(Loading.directive);
 Vue.prototype.$loading = Loading.service;
 Vue.prototype.$message = Message;
-
-Vue.use(VueConstants);
 
 Vue.config.productionTip = false;
 

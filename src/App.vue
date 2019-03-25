@@ -37,8 +37,8 @@ export default {
     TaskAddForm,
   },
 
-  constants: {
-    bus: new Vue(),
+  created() {
+    this.bus = new Vue();
   },
 };
 </script>

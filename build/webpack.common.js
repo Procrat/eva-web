@@ -10,12 +10,12 @@ function resolve(dir) {
 }
 
 
-module.exports = {
+module.exports = env => ({
   context: path.resolve(__dirname, '../'),
   entry: '@/main.js',
 
   resolve: {
-    extensions: ['.js', '.vue', '.wasm'],
+    extensions: ['.js', '.ts', '.vue', '.wasm'],
     alias: {
       '@': resolve('src'),
     },
@@ -31,6 +31,17 @@ module.exports = {
         test: /\.js$/,
         use: 'babel-loader',
         include: [resolve('src'), resolve('test')],
+      },
+      {
+        test: /\.(js|ts)$/,
+        use: [{
+          loader: 'ts-loader',
+          options: {
+            configFile: `build/tsconfig.${env}.json`,
+            appendTsSuffixTo: [/\.vue$/],
+          },
+        }],
+        exclude: /node_modules/,
       },
       {
         test: /\.(js|vue)$/,
@@ -68,4 +79,4 @@ module.exports = {
     new VueLoaderPlugin(),
     new HtmlWebpackPlugin({ title: 'Eva' }),
   ],
-};
+});

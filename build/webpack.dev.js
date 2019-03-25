@@ -6,7 +6,7 @@ const merge = require('webpack-merge');
 const commonWebpackConfig = require('./webpack.common');
 
 
-module.exports = merge(commonWebpackConfig, {
+module.exports = merge(commonWebpackConfig('development'), {
   mode: 'development',
 
   resolve: {

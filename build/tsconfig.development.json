@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.common.json",
+  "compilerOptions": {
+    "baseUrl": "..",
+    "paths": {
+      "@/*": ["src/*"],
+      "@backend/*": ["generated-wasm/debug/*"]
+    }
+  }
+}

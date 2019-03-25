@@ -82,7 +82,7 @@ const config = merge.smartStrategy({
   'module.rules': 'prepend',
   'module.rules.use': 'prepend',
 })([
-  commonWebpackConfig,
+  commonWebpackConfig('production'),
   {
     mode: 'production',
     resolve: {
