@@ -1,6 +1,9 @@
 <template>
   <el-card>
-    <el-form class="add-task-form">
+    <el-form
+      class="add-task-form"
+      @submit.native.prevent="addTask"
+    >
       <el-form-item>
         <el-input
           v-model="content"
@@ -54,7 +57,7 @@
       >
         <el-button
           type="primary"
-          @click="addTask"
+          native-type="submit"
         >
           Let's do this!
         </el-button>
