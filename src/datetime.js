@@ -31,6 +31,10 @@ export function inNDays(n) {
   return addDays(today(), n);
 }
 
+export function inNWeeks(n) {
+  return addDays(today(), n * 7);
+}
+
 export function lastDayOfMonth() {
   const lastDay = today();
   lastDay.setMonth(lastDay.getMonth() + 1, 0);
@@ -64,6 +68,8 @@ export function formatDatetime(datetime) {
     dateStr = '';
   } else if (date.getTime() === tomorrow().getTime()) {
     dateStr = 'Tomorrow';
+  } else if (date.getTime() < inNWeeks(1).getTime()) {
+    dateStr = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][date.getDay()];
   } else {
     dateStr = `${date.getDate()}/${date.getMonth() + 1}`;
   }
@@ -74,7 +80,7 @@ export function formatDatetime(datetime) {
     timeStr = '';
   }
 
-  let datetimeStr = [dateStr, timeStr].join(' ').trim();
+  let datetimeStr = `${dateStr} ${timeStr}`.trim();
   if (datetimeStr === '') {
     datetimeStr = 'Today';
   }
