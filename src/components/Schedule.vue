@@ -1,14 +1,10 @@
 <template>
   <el-card>
-    <div
-      v-if="scheduleError"
-      key="taskList"
-    >
+    <template v-if="scheduleError">
       <el-alert
-        :description="scheduleError"
+        :title="scheduleError"
         :closable="false"
         type="error"
-        title=""
         show-icon
         class="alert"
       />
@@ -65,11 +61,10 @@
           </template>
         </el-table-column>
       </el-table>
-    </div>
+    </template>
 
-    <div
+    <template
       v-else
-      key="schedule"
       class="schedule"
     >
       <el-table
@@ -147,7 +142,7 @@
           </template>
         </el-table-column>
       </el-table>
-    </div>
+    </template>
   </el-card>
 </template>
 
@@ -221,10 +216,6 @@ export default {
 <style lang="sass" scoped>
 .alert.el-alert
   margin-bottom: 20px
-  .el-alert__content
-    padding-left: 16px
-  .el-alert__description
-    margin: 5px 0
 
 .schedule
   .el-table
