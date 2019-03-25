@@ -112,12 +112,12 @@ export default {
         }, {
           text: '+1 week',
           onClick(picker) {
-            picker.$emit('pick', DateTime.endOfDay(DateTime.inNDays(7)));
+            picker.$emit('pick', DateTime.endOfDay(DateTime.inNWeeks(1)));
           },
         }, {
           text: '+2 weeks',
           onClick(picker) {
-            picker.$emit('pick', DateTime.endOfDay(DateTime.inNDays(14)));
+            picker.$emit('pick', DateTime.endOfDay(DateTime.inNWeeks(2)));
           },
         }, {
           text: 'This month',
