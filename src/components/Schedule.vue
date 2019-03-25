@@ -1,10 +1,10 @@
 <template>
-  <ElCard>
+  <el-card>
     <div
       v-if="scheduleError"
       key="taskList"
     >
-      <ElAlert
+      <el-alert
         :description="scheduleError"
         :closable="false"
         type="error"
@@ -13,14 +13,14 @@
         class="alert"
       />
 
-      <ElTable :data="tasks">
-        <ElTableColumn>
+      <el-table :data="tasks">
+        <el-table-column>
           <template slot-scope="{ row }">
             {{ row.content }}
           </template>
-        </ElTableColumn>
+        </el-table-column>
 
-        <ElTableColumn
+        <el-table-column
           label="Deadline"
           align="center"
           width="140px"
@@ -28,9 +28,9 @@
           <template slot-scope="{ row }">
             {{ row.deadline | formatDatetime }}
           </template>
-        </ElTableColumn>
+        </el-table-column>
 
-        <ElTableColumn
+        <el-table-column
           label="Duration"
           align="center"
           width="100px"
@@ -38,9 +38,9 @@
           <template slot-scope="{ row }">
             {{ row.duration | formatDuration }}
           </template>
-        </ElTableColumn>
+        </el-table-column>
 
-        <ElTableColumn
+        <el-table-column
           label="Importance"
           align="center"
           width="120px"
@@ -48,23 +48,23 @@
           <template slot-scope="{ row }">
             {{ row.importance }}
           </template>
-        </ElTableColumn>
+        </el-table-column>
 
-        <ElTableColumn
+        <el-table-column
           align="center"
           width="66px"
         >
           <template slot-scope="{ row }">
             <el-button
-              :plain="true"
+              plain
               size="mini"
-              icon="delete"
+              icon="el-icon-delete"
               type="danger"
               @click="remove(row.id)"
             />
           </template>
-        </ElTableColumn>
-      </ElTable>
+        </el-table-column>
+      </el-table>
     </div>
 
     <div
@@ -72,7 +72,7 @@
       key="schedule"
       class="schedule"
     >
-      <ElTable
+      <el-table
         v-loading="loading"
         :data="schedule"
         element-loading-text="Thinking really hard about your schedule..."
@@ -86,7 +86,7 @@
           </span>
         </div>
 
-        <ElTableColumn
+        <el-table-column
           label="Schedule"
           align="center"
           width="140px"
@@ -94,15 +94,15 @@
           <template slot-scope="{ row }">
             {{ row.when | formatDatetime }}
           </template>
-        </ElTableColumn>
+        </el-table-column>
 
-        <ElTableColumn>
+        <el-table-column>
           <template slot-scope="{ row }">
             {{ row.task.content }}
           </template>
-        </ElTableColumn>
+        </el-table-column>
 
-        <ElTableColumn
+        <el-table-column
           label="Deadline"
           align="center"
           width="140px"
@@ -110,9 +110,9 @@
           <template slot-scope="{ row }">
             {{ row.task.deadline | formatDatetime }}
           </template>
-        </ElTableColumn>
+        </el-table-column>
 
-        <ElTableColumn
+        <el-table-column
           label="Duration"
           align="center"
           width="100px"
@@ -120,9 +120,9 @@
           <template slot-scope="{ row }">
             {{ row.task.duration | formatDuration }}
           </template>
-        </ElTableColumn>
+        </el-table-column>
 
-        <ElTableColumn
+        <el-table-column
           label="Importance"
           align="center"
           width="120px"
@@ -130,25 +130,25 @@
           <template slot-scope="{ row }">
             {{ row.task.importance }}
           </template>
-        </ElTableColumn>
+        </el-table-column>
 
-        <ElTableColumn
+        <el-table-column
           align="center"
           width="66px"
         >
           <template slot-scope="{ row }">
-            <ElButton
-              :plain="true"
+            <el-button
+              plain
               type="danger"
-              icon="delete"
+              icon="el-icon-delete"
               size="mini"
               @click="remove(row.task.id)"
             />
           </template>
-        </ElTableColumn>
-      </ElTable>
+        </el-table-column>
+      </el-table>
     </div>
-  </ElCard>
+  </el-card>
 </template>
 
 

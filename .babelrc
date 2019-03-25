@@ -1,14 +1,15 @@
 {
   "presets": [
     ["@babel/preset-env", {
-      "useBuiltIns": "usage"
+      "useBuiltIns": "usage",
+      "corejs": 2,
     }]
   ],
   "plugins": [
     "@babel/plugin-syntax-dynamic-import",
     ["component", {
       "libraryName": "element-ui",
-      "styleLibraryName": "theme-default"
+      "styleLibraryName": "theme-chalk"
     }]
   ],
   "env": {

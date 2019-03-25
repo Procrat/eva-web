@@ -46,13 +46,23 @@ export function inNMonths(n) {
   return addMonths(today(), n);
 }
 
+export function endOfDay(datetime) {
+  return new Date(
+    datetime.getFullYear(),
+    datetime.getMonth(),
+    datetime.getDate(),
+    23,
+    59,
+  );
+}
+
 
 export function formatDatetime(datetime) {
   const date = stripTime(datetime);
   let dateStr;
   if (date.getTime() === today().getTime()) {
     dateStr = '';
-  } else if (date.getTime() === addDays(today(), 1).getTime()) {
+  } else if (date.getTime() === tomorrow().getTime()) {
     dateStr = 'Tomorrow';
   } else {
     dateStr = `${date.getDate()}/${date.getMonth() + 1}`;

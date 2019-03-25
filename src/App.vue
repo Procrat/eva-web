@@ -1,24 +1,24 @@
 <template>
   <div id="app">
-    <ElRow class="logo">
+    <el-row class="logo">
       <img src="@/assets/logo.png">
-    </ElRow>
+    </el-row>
 
-    <ElRow
+    <el-row
       :gutter="20"
       class="content"
     >
-      <ElCol
+      <el-col
         id="sidebar"
         :span="5"
       >
         <TaskAddForm :bus="bus" />
-      </ElCol>
+      </el-col>
 
-      <ElCol :span="19">
+      <el-col :span="19">
         <Schedule :bus="bus" />
-      </ElCol>
-    </ElRow>
+      </el-col>
+    </el-row>
   </div>
 </template>
 
@@ -78,5 +78,5 @@ summary, time, mark, audio, video
   margin: 10px !important
 
 .el-message
-  top: 29px
+  top: 25px
 </style>
