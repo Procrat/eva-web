@@ -1,17 +1,21 @@
 <template>
   <el-card>
     <el-form
+      ref="form"
+      :model="this"
+      :rules="formRules"
       class="add-task-form"
+      :show-message="false"
       @submit.native.prevent="addTask"
     >
-      <el-form-item>
+      <el-form-item prop="content">
         <el-input
           v-model="content"
           placeholder="What do you want to do?"
         />
       </el-form-item>
 
-      <el-form-item>
+      <el-form-item prop="deadline">
         <el-date-picker
           v-model="deadline"
           type="datetime"
@@ -25,7 +29,7 @@
         />
       </el-form-item>
 
-      <el-form-item>
+      <el-form-item prop="durationMinutes">
         <el-select
           v-model="durationMinutes"
           filterable
@@ -42,7 +46,7 @@
         </el-select>
       </el-form-item>
 
-      <el-form-item>
+      <el-form-item prop="importance">
         <el-slider
           v-model="importance"
           :min="0"
@@ -135,6 +139,25 @@ export default {
         },
       ],
     },
+
+    formRules: {
+      content: [{ required: true, trigger: 'change', message: 'You didn\'t say what it is you want to achieve.' }],
+      deadline: [
+        { required: true, trigger: 'change', message: 'You didn\'t mention when it\'s due.' },
+        {
+          validator: (rule, value, callback) => {
+            if (value <= new Date()) {
+              callback(new Error('The deadline you specified is in the past.'));
+            } else {
+              callback();
+            }
+          },
+          trigger: 'change',
+        },
+      ],
+      durationMinutes: [{ required: true, trigger: 'change', message: 'You didn\'t mention how long you think it would take.' }],
+      importance: [{ required: true, trigger: 'change' }],
+    },
   },
 
   data() {
@@ -147,22 +170,18 @@ export default {
   },
 
   methods: {
-    addTask() {
-      if (!this.content) {
-        this.$message.error('You didn\'t say what it is you want to achieve.');
-        return;
-      }
-      if (!this.deadline) {
-        this.$message.error('You didn\'t mention when it\'s due.');
-        return;
-      }
-      if (!this.durationMinutes) {
-        this.$message.error('You didn\'t mention how long you think it would take.');
-        return;
-      }
+    async addTask() {
+      let valid;
 
-      if (!(this.deadline > new Date())) {
-        this.$message.error('The deadline you specified is in the past.');
+      this.$refs.form.validate((valid_, erroneousFields) => {
+        valid = valid_;
+        if (!valid) {
+          const firstError = Object.entries(erroneousFields)[0][1][0];
+          this.$message.error(firstError.message);
+        }
+      });
+
+      if (!valid) {
         return;
       }
 
@@ -174,18 +193,14 @@ export default {
         time_segment_id: 0,
       };
 
-      this.$api.addTask(task)
-        .then((_addedTask) => {
-          this.$message.success('Task added!');
-
-          this.content = null;
-          this.deadline = null;
-          this.durationMinutes = null;
-          this.importance = 5;
-
-          this.bus.$emit('task-added');
-        })
-        .catch(error => this.$message.error(error));
+      try {
+        await this.$api.addTask(task);
+        this.$message.success('Task added!');
+        this.$refs.form.resetFields();
+        this.bus.$emit('task-added');
+      } catch (error) {
+        this.$message.error(error);
+      }
     },
 
     formatImportance(importance) {
