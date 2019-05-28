@@ -2,6 +2,7 @@ const path = require('path');
 
 const webpack = require('webpack');
 const merge = require('webpack-merge');
+const FilterWarningsPlugin = require('webpack-filter-warnings-plugin');
 
 const commonWebpackConfig = require('./webpack.common');
 
@@ -27,6 +28,9 @@ module.exports = merge(commonWebpackConfig, {
 
   plugins: [
     new webpack.HotModuleReplacementPlugin(),
+    new FilterWarningsPlugin({
+      exclude: /Critical dependency: the request of a dependency is an expression/,
+    }),
   ],
 
   devServer: {
