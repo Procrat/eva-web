@@ -41,6 +41,9 @@ extern "C" {
 
     #[wasm_bindgen(method)]
     pub fn allTasksPerTimeSegment(database: &Database) -> Promise;
+
+    #[wasm_bindgen(method)]
+    pub fn allTimeSegments(database: &Database) -> Promise;
 }
 
 impl DatabaseT for Database {
@@ -139,7 +142,17 @@ impl DatabaseT for Database {
     }
 
     fn all_time_segments<'a: 'b, 'b>(&'a self) -> LocalFutureObj<'b, Result<Vec<TimeSegment>>> {
-        unimplemented!()
+        let future_time_segments = async move {
+            let documents = js_await!(self.allTimeSegments())
+                .map_err(|e| Error("while loading time segments", e))?;
+            Ok(documents
+                .into_serde::<Vec<serde::TimeSegmentWrapper>>()
+                .map_err(|e| Error("while deserialising time segments", e.into()))?
+                .into_iter()
+                .map(|t| t.0)
+                .collect())
+        };
+        LocalFutureObj::new(Box::new(future_time_segments))
     }
 }
 

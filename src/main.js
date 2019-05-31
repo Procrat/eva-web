@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import VueConstants from 'vue-constants';
+import VueRouter from 'vue-router';
 
 import {
   Alert,
@@ -13,6 +14,7 @@ import {
   Loading,
   Message,
   Option,
+  Radio,
   Row,
   Select,
   Slider,
@@ -39,6 +41,7 @@ Vue.use(Form);
 Vue.use(FormItem);
 Vue.use(Input);
 Vue.use(Option);
+Vue.use(Radio);
 Vue.use(Row);
 Vue.use(Select);
 Vue.use(Slider);
@@ -50,6 +53,8 @@ Vue.prototype.$loading = Loading.service;
 Vue.prototype.$message = Message;
 
 Vue.use(VueConstants);
+
+Vue.use(VueRouter);
 
 Vue.config.productionTip = false;
 

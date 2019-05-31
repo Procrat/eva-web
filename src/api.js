@@ -1,4 +1,20 @@
+import Color from 'color';
+
 const API = import('@backend/eva.js');
+
+
+export class TimeSegment {
+  constructor(id, name, start, ranges, period) {
+    this.id = id;
+    this.name = name;
+    this.start = start;
+    this.ranges = ranges;
+    this.period = period;
+    this.uniqueId = `${this.name}:${this.id || new Date().getTime()}`;
+    // TODO make colors persistent
+    this.color = new Color({ h: Math.floor(Math.random() * 361), s: 100, l: 80 });
+  }
+}
 
 
 function parseDate(timestamp) {
@@ -11,6 +27,20 @@ function parseTask(task) {
     ...task,
     deadline: parseDate(task.deadline),
   };
+}
+
+
+function parseTimeSegment(timeSegment) {
+  return new TimeSegment(
+    timeSegment.id,
+    timeSegment.name,
+    parseDate(timeSegment.start),
+    timeSegment.ranges.map(range => ({
+      start: parseDate(range.start),
+      end: parseDate(range.end),
+    })),
+    timeSegment.period,
+  );
 }
 
 
@@ -38,6 +68,11 @@ function jsApi(wasmApi) {
         when: parseDate(scheduledTask.when),
         task: parseTask(scheduledTask.task),
       }));
+    },
+
+    async listTimeSegments() {
+      const timeSegments = await wasmApi.list_time_segments();
+      return timeSegments.map(segment => parseTimeSegment(segment));
     },
   };
 }

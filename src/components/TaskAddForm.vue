@@ -114,7 +114,7 @@ export default {
         }, {
           text: 'This week',
           onClick(picker) {
-            picker.$emit('pick', DateTime.endOfDay(DateTime.nextDayOfWeek(6)));
+            picker.$emit('pick', DateTime.endOfDay(DateTime.firstDayOfWeek(6)));
           },
         }, {
           text: '+1 week',

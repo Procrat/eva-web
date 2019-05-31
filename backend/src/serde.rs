@@ -72,12 +72,12 @@ struct ScheduledTask {
     when: DateTime<Utc>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct TimeSegmentWrapper(
     #[serde(with = "TimeSegment")] pub eva::time_segment::NamedTimeSegment,
 );
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(remote = "eva::time_segment::NamedTimeSegment")]
 struct TimeSegment {
     #[serde(with = "id", alias = "_id")]

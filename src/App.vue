@@ -1,7 +1,15 @@
 <template>
   <div id="app">
-    <el-row class="logo">
-      <img src="@/assets/logo.png">
+    <el-row class="header">
+      <router-link to="/">
+        <img src="@/assets/logo.png">
+      </router-link>
+      <router-link
+        to="/time-segments"
+        class="time-segments-link"
+      >
+        ⚙
+      </router-link>
     </el-row>
 
     <el-row
@@ -16,7 +24,7 @@
       </el-col>
 
       <el-col :span="19">
-        <Schedule :bus="bus" />
+        <router-view />
       </el-col>
     </el-row>
   </div>
@@ -25,54 +33,71 @@
 
 <script>
 import Vue from 'vue';
+import VueRouter from 'vue-router';
 
-import Schedule from '@/components/Schedule.vue';
-import TaskAddForm from '@/components/TaskAddForm.vue';
+import Schedule from '@/components/Schedule';
+import TaskAddForm from '@/components/TaskAddForm';
+import TimeSegments from '@/components/TimeSegments';
+
+const bus = new Vue();
+const routes = [
+  { path: '/', component: Schedule, props: { bus } },
+  { path: '/time-segments', component: TimeSegments },
+];
 
 export default {
   name: 'App',
 
   components: {
-    Schedule,
     TaskAddForm,
   },
 
   constants: {
-    bus: new Vue(),
+    bus,
   },
+
+  router: new VueRouter({ routes }),
 };
 </script>
 
 
 <style lang="sass">
-
-@import './assets/reset.sass'
-
-$accent-colour: #00AEEF
+@import '@/assets/reset.sass'
+@import '@/assets/colors.sass'
 
 img
   display: block
 
-html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p,
-blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img,
-ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i,
-center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption,
-tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed,
-figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section,
-summary, time, mark, audio, video
+body
   font-family: "Helvetica Neue", Helvetica,
     "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑",
     Arial, sans-serif
+  font-size: 14px
 
-.logo
+h1
+  font-size: 20px
+  margin-bottom: 30px
+h2
+  font-size: 18px
+h3
+  font-size: 16px
+
+.header
   margin: 20px
   width: calc(100% - 40px)
-  background-color: $accent-colour
-  border: 1px solid $accent-colour
+  background-color: $accent-color
+  border: 1px solid $accent-color
   box-shadow: 0 2px 4px 0 rgba(0,0,0,.12), 0 0 6px 0 rgba(0,0,0,.04);
   border-radius: 6px
   img
     margin-top: -16px
+    float: left
+  a.time-segments-link
+    margin: 7px 7px 0 0
+    float: right
+    font-size: 40px
+    color: white
+    text-decoration: none
 
 .content
   margin: 10px !important
