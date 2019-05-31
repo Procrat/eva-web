@@ -13,11 +13,13 @@
     "lint": "eslint --ext .js,.vue src"
   },
   "dependencies": {
+    "color": "^3.1.1",
     "element-ui": "^2.6.3",
     "pouchdb": "^7.0.0",
     "pouchdb-find": "^7.0.0",
     "vue": "^2.6.10",
-    "vue-constants": "^1.0.3"
+    "vue-constants": "^1.0.3",
+    "vue-router": "^3.0.6"
   },
   "devDependencies": {
     "@babel/core": "^7.4.0",

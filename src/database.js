@@ -113,6 +113,16 @@ export class Database {
     });
     return tasksPerTimeSegment;
   }
+
+  async allTimeSegments() {
+    const response = await this.pouch.find({
+      selector: { type: 'time-segment' },
+    });
+    if (response.warning) {
+      console.warn(`Fetching time segments issued a warning: ${response.warning}`);
+    }
+    return response.docs;
+  }
 }
 
 

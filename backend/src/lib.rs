@@ -61,6 +61,21 @@ pub fn schedule() -> Promise {
     promisify_future::<eva::Schedule<eva::Task>, serde::ScheduleWrapper, _>(future_schedule)
 }
 
+#[wasm_bindgen]
+pub fn list_time_segments() -> Promise {
+    let future_segments = async {
+        let config = await!(configuration())?;
+        let segments = await!(eva::time_segments(&config))?;
+        Ok(segments
+            .into_iter()
+            .map(serde::TimeSegmentWrapper)
+            .collect::<Vec<_>>())
+    };
+    promisify_future::<Vec<serde::TimeSegmentWrapper>, Vec<serde::TimeSegmentWrapper>, _>(
+        future_segments,
+    )
+}
+
 fn promisify_future<Item, With, F>(future: F) -> Promise
 where
     With: ::serde::Serialize + From<Item>,

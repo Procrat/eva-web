@@ -1,3 +1,6 @@
+export const oneWeekInS = 7 * 24 * 60 * 60;
+export const oneWeekInMs = oneWeekInS * 1000;
+
 function stripTime(datetime) {
   return new Date(
     datetime.getFullYear(),
@@ -6,25 +9,22 @@ function stripTime(datetime) {
   );
 }
 
+function copy(date) {
+  return new Date(date.getTime());
+}
+
 export function today() {
   return stripTime(new Date());
 }
 
 function addDays(date, days) {
-  date.setDate(date.getDate() + days);
-  return date;
+  const newDate = copy(date);
+  newDate.setDate(date.getDate() + days);
+  return newDate;
 }
 
 export function tomorrow() {
   return addDays(today(), 1);
-}
-
-export function nextDayOfWeek(dayOfWeek) {
-  // Weeks should start on Monday: 0 = Monday; 6 = Sunday
-  const currentWeekDay = (today().getDay() + 6) % 7;
-  const wantedWeekDay = today();
-  wantedWeekDay.setDate(today().getDate() + (dayOfWeek - currentWeekDay));
-  return wantedWeekDay;
 }
 
 export function inNDays(n) {
@@ -42,8 +42,9 @@ export function lastDayOfMonth() {
 }
 
 function addMonths(date, months) {
-  date.setMonth(date.getMonth() + months);
-  return date;
+  const newDate = copy(date);
+  newDate.setMonth(date.getMonth() + months);
+  return newDate;
 }
 
 export function inNMonths(n) {
@@ -60,6 +61,34 @@ export function endOfDay(datetime) {
   );
 }
 
+export function firstDayOfWeekAfter(datetime, dayOfWeek) {
+  // Weeks should start on Monday: 0 = Monday; 6 = Sunday
+  const currentWeekDay = (datetime.getDay() + 6) % 7;
+  const wantedWeekDay = stripTime(datetime);
+  wantedWeekDay.setDate(datetime.getDate() + ((dayOfWeek - currentWeekDay + 7) % 7));
+  return wantedWeekDay;
+}
+
+export function firstDayOfWeek(dayOfWeek) {
+  return firstDayOfWeekAfter(today(), dayOfWeek);
+}
+
+export function firstDayAndHourAfter(datetime, day, hour) {
+  let newDatetime;
+  if (day === (datetime.getDay() + 6) % 7) {
+    newDatetime = stripTime(datetime);
+    // Ensure that we return a date _after_ datetime, even if it's the same day.
+    if (hour < datetime.getHours()
+        || (hour === datetime.getHours() && datetime.getMinutes() > 0)) {
+      newDatetime.setDate(datetime.getDate() + 7);
+    }
+  } else {
+    newDatetime = firstDayOfWeekAfter(datetime, day);
+  }
+  newDatetime.setHours(hour);
+  return newDatetime;
+}
+
 
 export function formatDatetime(datetime) {
   const date = stripTime(datetime);
@@ -74,8 +103,8 @@ export function formatDatetime(datetime) {
     dateStr = `${date.getDate()}/${date.getMonth() + 1}`;
   }
 
-  let timeStr = `${datetime.getHours()}:`
-    + `${datetime.getMinutes().toString().padStart(2, '0')}`;
+  let timeStr = `${datetime.getHours()}:\
+    ${datetime.getMinutes().toString().padStart(2, '0')}`;
   if (timeStr === '23:59') {
     timeStr = '';
   }
