@@ -70,6 +70,18 @@ function jsApi(wasmApi) {
       }));
     },
 
+    async addTimeSegment(segment) {
+      return wasmApi.add_time_segment(segment);
+    },
+
+    async deleteTimeSegment(segment) {
+      return wasmApi.delete_time_segment(segment);
+    },
+
+    async updateTimeSegment(segment) {
+      return wasmApi.update_time_segment(segment);
+    },
+
     async listTimeSegments() {
       const timeSegments = await wasmApi.list_time_segments();
       return timeSegments.map(segment => parseTimeSegment(segment));

@@ -1,10 +1,17 @@
+import Color from 'color';
 import { expect } from 'chai';
 import PouchDB from 'pouchdb';
 
 import api from '@/api';
 
 
-function sampleDeadline() {
+function addHours(date, hours) {
+  date.setHours(date.getHours() + hours);
+  return date;
+}
+
+
+function sampleDate() {
   const deadline = new Date();
   // We don't store milliseconds, so let's round it so we can compare with it.
   deadline.setMilliseconds(0);
@@ -15,7 +22,7 @@ function sampleDeadline() {
 function sampleNewTask(overrides) {
   return {
     content: 'some task',
-    deadline: sampleDeadline(),
+    deadline: sampleDate(),
     duration: 60 * 60,
     importance: 8,
     time_segment_id: 0,
@@ -24,9 +31,29 @@ function sampleNewTask(overrides) {
 }
 
 
-function addHours(date, hours) {
-  date.setHours(date.getHours() + hours);
-  return date;
+function sampleNewTimeSegment() {
+  const start = new Date();
+  return {
+    name: 'some time segment',
+    start,
+    period: 7 * 42 * 60 * 60,
+    ranges: [{
+      start: addHours(start, 24),
+      end: addHours(start, 27),
+    }],
+  };
+}
+
+
+function timeSegmentWithoutGeneratedProperties(segment) {
+  expect(segment.uniqueId).to.be.a('string');
+  expect(segment.color).to.be.an.instanceof(Color);
+  const copy = Object.assign({}, segment);
+  delete copy.uniqueId;
+  delete copy.color;
+  // We ensure that the returned object is read-only since we made a shallow
+  // copy.
+  return Object.freeze(copy);
 }
 
 
@@ -52,6 +79,15 @@ describe('api', () => {
       const addedTask2 = await this.$api.addTask(newTask);
       expect(addedTask2.id).to.be.a('number').and.not.eql(addedTask.id);
       expect(addedTask2).to.deep.include(newTask);
+    });
+
+    it('should fail when a task with non-existent time segment is added', async function _() {
+      const badTask = sampleNewTask({ time_segment_id: 1 });
+      return expect(this.$api.addTask(badTask))
+        .to.be.rejectedWith('A database error occurred while searching for the time segment of the new task: {"status":404,"name":"not_found","message":"missing","reason":"missing"}')
+        .then(async () => {
+          expect(await this.$api.listTasks()).to.have.lengthOf(0);
+        });
     });
   });
 
@@ -106,12 +142,12 @@ describe('api', () => {
     it('should return a schedule with exactly the tasks I added', async function _() {
       const task1 = sampleNewTask({
         content: 'task1',
-        deadline: addHours(sampleDeadline(), 5),
+        deadline: addHours(sampleDate(), 5),
       });
       const addedTask1 = await this.$api.addTask(task1);
       const task2 = sampleNewTask({
         content: 'task2',
-        deadline: addHours(sampleDeadline(), 4),
+        deadline: addHours(sampleDate(), 4),
       });
       const addedTask2 = await this.$api.addTask(task2);
 
@@ -122,6 +158,75 @@ describe('api', () => {
       expect(schedule[0].task).to.eql(addedTask2);
       expect(schedule[1]).to.have.keys(['task', 'when']);
       expect(schedule[1].task).to.eql(addedTask1);
+    });
+  });
+
+  describe('#addTimeSegment', () => {
+    it('should add a segment', async function _() {
+      const newTimeSegment = sampleNewTimeSegment();
+      await this.$api.addTimeSegment(newTimeSegment);
+      const timeSegments = await this.$api.listTimeSegments();
+      expect(timeSegments).to.have.lengthOf(2);
+      const {
+        id, // Only present after it's been stored
+        ...cleanSegment
+      } = timeSegmentWithoutGeneratedProperties(timeSegments[1]);
+      expect(id).to.be.a('number');
+      expect(cleanSegment).to.eql(newTimeSegment);
+    });
+  });
+
+  describe('#deleteTimeSegment', () => {
+    it('shouldn\'t delete segments that have tasks', async function _() {
+      await this.$api.addTask(sampleNewTask());
+      const defaultSegment = (await this.$api.listTimeSegments())[0];
+      return expect(this.$api.deleteTimeSegment(defaultSegment))
+        .to.be.rejectedWith('A database error occurred while deleting a time segment: There are still tasks associated with this time segment. Please delete them or move them to another segment.')
+        .then(async () => {
+          expect(await this.$api.listTimeSegments()).to.have.lengthOf(1);
+        });
+    });
+
+    it('should delete segments that have no tasks', async function _() {
+      const defaultSegment = (await this.$api.listTimeSegments())[0];
+      await this.$api.deleteTimeSegment(defaultSegment);
+      const segments = await this.$api.listTimeSegments();
+      expect(segments).to.be.empty;
+    });
+  });
+
+  describe('#updateTimeSegment', () => {
+    it('should update a time segment, leaving the id intact', async function _() {
+      const newSegment = sampleNewTimeSegment();
+      await this.$api.addTimeSegment(newSegment);
+      const timeSegments = await this.$api.listTimeSegments();
+      expect(timeSegments).to.have.lengthOf(2);
+      const addedSegment = timeSegments[1];
+      addedSegment.name = 'new segment name';
+      addedSegment.start = sampleDate();
+      addedSegment.period = 8 * 42 * 60 * 60;
+      addedSegment.ranges = [];
+      await this.$api.updateTimeSegment(addedSegment);
+      const updatedSegments = await this.$api.listTimeSegments();
+      expect(updatedSegments).to.have.lengthOf(2);
+      expect(timeSegmentWithoutGeneratedProperties(updatedSegments[1]))
+        .to.eql(timeSegmentWithoutGeneratedProperties(addedSegment));
+    });
+  });
+
+  describe('#listTimeSegment', () => {
+    it('should list the default segment', async function _() {
+      const segments = await this.$api.listTimeSegments();
+      expect(segments).to.have.lengthOf(1);
+      const segment = segments[0];
+      expect(segment.id).to.equal(0);
+      expect(segment.name).to.equal('Default');
+      expect(segment.ranges).to.have.lengthOf(1);
+      expect(segment.start.getTime()).to.equal(segment.ranges[0].start.getTime());
+      expect(segment.ranges[0].end.getTime())
+        .to.equal(segment.start.getTime() + segment.period * 1000);
+      expect(segment.uniqueId).to.be.a('string');
+      expect(segment.color).to.be.an.instanceof(Color);
     });
   });
 });

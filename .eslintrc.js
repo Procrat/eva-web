@@ -33,8 +33,6 @@ module.exports = {
     'no-underscore-dangle': ['error', { allow: ['_id', '_rev']}],
     // Allow for-of loops
     'no-restricted-syntax': ['off', 'ForOfStatement'],
-    // Allow imported things to be listed in dev dependencies as well
-    'import/no-extraneous-dependencies': ['error', { devDependencies: true }],
   },
   settings: {
     // Resolve imports through webpack
@@ -44,4 +42,4 @@ module.exports = {
       }
     }
   },
-}
+};
