@@ -11,18 +11,18 @@ crate-type = ["cdylib"]
 [dependencies]
 chrono = { version = "0.4", features = ["serde"] }
 console_error_panic_hook = "0.1"
-derive_more = "0.14"
+derive_more = "0.15"
 failure = "0.1"
-futures-preview = { version = "=0.3.0-alpha.13", features = ["compat"] }
+futures-preview = { version = "=0.3.0-alpha.16" }
 js-sys = "0.3"
 rand = { version = "0.6", features = ["wasm-bindgen"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 wasm-bindgen = { version = "0.2", features = ["serde-serialize"] }
-wasm-bindgen-futures = "0.3"
+wasm-bindgen-futures = { version = "0.3", features = ["futures_0_3"] }
 web-sys = { version = "0.3", features = ["console"] }
 
 [dependencies.eva]
 git = "https://github.com/Procrat/eva"
-rev = "6536d97f8b99f1249a80971da8a6f12fd83747cd"
+rev = "026a1519a9a61addd6dd1828410ec3ffed5428c2"
 default-features = false
