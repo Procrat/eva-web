@@ -1,7 +1,7 @@
 use eva::database::{Database as DatabaseT, Error, Result};
 use eva::time_segment::{NamedTimeSegment as TimeSegment, NewNamedTimeSegment as NewTimeSegment};
 use futures::future::LocalFutureObj;
-use js_sys::Promise;
+use js_sys::{Array, Promise};
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
 use wasm_bindgen_futures::futures_0_3::JsFuture;
@@ -28,13 +28,27 @@ extern "C" {
     pub fn open() -> Promise;
 
     #[wasm_bindgen(method)]
-    pub fn put(database: &Database, id: u32, type_: String, document: JsValue) -> Promise;
+    pub fn create(database: &Database, document: JsValue, type_: String, id: u32) -> Promise;
 
     #[wasm_bindgen(method)]
-    pub fn get(database: &Database, id: String) -> Promise;
+    pub fn update(database: &Database, document: JsValue, type_: String, rev: String) -> Promise;
 
     #[wasm_bindgen(method)]
-    pub fn remove(database: &Database, document: JsValue) -> Promise;
+    pub fn updateRegardlessOfRev(
+        database: &Database,
+        id: u32,
+        document: JsValue,
+        type_: String,
+    ) -> Promise;
+
+    #[wasm_bindgen(method)]
+    pub fn get(database: &Database, id: u32) -> Promise;
+
+    #[wasm_bindgen(method)]
+    pub fn delete(database: &Database, document: JsValue, type_: String, rev: String) -> Promise;
+
+    #[wasm_bindgen(method)]
+    pub fn deleteRegardlessOfRev(database: &Database, id: u32) -> Promise;
 
     #[wasm_bindgen(method)]
     pub fn allTasks(database: &Database) -> Promise;
@@ -43,17 +57,22 @@ extern "C" {
     pub fn allTasksPerTimeSegment(database: &Database) -> Promise;
 
     #[wasm_bindgen(method)]
+    pub fn tasksForTimeSegment(database: &Database, time_segment_id: u32) -> Promise;
+
+    #[wasm_bindgen(method)]
     pub fn allTimeSegments(database: &Database) -> Promise;
 }
 
 impl DatabaseT for Database {
     fn add_task<'a: 'b, 'b>(&'a self, task: eva::NewTask) -> LocalFutureObj<'b, Result<eva::Task>> {
-        // Due to a bug in wasm-bindgen, u32s larger than 2**31 turn negative in JS
-        let id = rand::random::<u32>() % 2u32.pow(31);
         let future = async move {
+            // Assert that the referenced time segment exist
+            let _segment = js_await!(self.get(task.time_segment_id))
+                .map_err(|e| Error("while searching for the time segment of the new task", e))?;
+            let id = rand::random();
             let serialised_task = JsValue::from_serde(&serde::NewTaskWrapper(task.clone()))
                 .map_err(|e| Error("while serialising a task", e.into()))?;
-            let _result = js_await!(self.put(id, "task".into(), serialised_task))
+            let _result = js_await!(self.create(serialised_task, "task".into(), id))
                 .map_err(|e| Error("while saving a task", e))?;
             Ok(eva::Task {
                 id,
@@ -69,10 +88,8 @@ impl DatabaseT for Database {
 
     fn delete_task<'a: 'b, 'b>(&'a self, id: u32) -> LocalFutureObj<'b, Result<()>> {
         let future = async move {
-            let document = js_await!(self.get(format!("{}", id)))
-                .map_err(|e| Error("while removing a task", e))?;
-            let _result =
-                js_await!(self.remove(document)).map_err(|e| Error("while removing a task", e))?;
+            let _result = js_await!(self.deleteRegardlessOfRev(id))
+                .map_err(|e| Error("while deleting a task", e))?;
             Ok(())
         };
         LocalFutureObj::new(Box::new(future))
@@ -124,21 +141,59 @@ impl DatabaseT for Database {
         &'a self,
         time_segment: NewTimeSegment,
     ) -> LocalFutureObj<'b, Result<()>> {
-        unimplemented!()
+        let id = rand::random();
+        let serialised_segment = JsValue::from_serde(&serde::NewTimeSegmentWrapper(time_segment))
+            .map_err(|e| Error("while serialising a time segment", e.into()));
+        let future = async move {
+            let _result = js_await!(self.create(serialised_segment?, "time-segment".into(), id))
+                .map_err(|e| Error("while saving a time segment", e))?;
+            Ok(())
+        };
+        LocalFutureObj::new(Box::new(future))
     }
 
     fn delete_time_segment<'a: 'b, 'b>(
         &'a self,
         time_segment: TimeSegment,
     ) -> LocalFutureObj<'b, Result<()>> {
-        unimplemented!()
+        let future = async move {
+            // Assert that this segment doesn't have any tasks associated with it
+            let tasks: Array = js_await!(self.tasksForTimeSegment(time_segment.id))
+                .map_err(|e| Error("while fetching tasks for a time segment", e))?
+                .into();
+            if tasks.length() > 0 {
+                Err(Error(
+                    "while deleting a time segment",
+                    failure::err_msg(
+                        "There are still tasks associated with this time segment. Please delete \
+                         them or move them to another segment.",
+                    ),
+                ))?;
+            }
+            let _result = js_await!(self.deleteRegardlessOfRev(time_segment.id))
+                .map_err(|e| Error("while deleting a time segment", e))?;
+            Ok(())
+        };
+        LocalFutureObj::new(Box::new(future))
     }
 
     fn update_time_segment<'a: 'b, 'b>(
         &'a self,
         time_segment: TimeSegment,
     ) -> LocalFutureObj<'b, Result<()>> {
-        unimplemented!()
+        let id = time_segment.id;
+        let serialised_segment = JsValue::from_serde(&serde::TimeSegmentWrapper(time_segment))
+            .map_err(|e| Error("while serialising a time segment", e.into()));
+        let future = async move {
+            let _result = js_await!(self.updateRegardlessOfRev(
+                id,
+                serialised_segment?,
+                "time-segment".into()
+            ))
+            .map_err(|e| Error("while updating a time segment", e))?;
+            Ok(())
+        };
+        LocalFutureObj::new(Box::new(future))
     }
 
     fn all_time_segments<'a: 'b, 'b>(&'a self) -> LocalFutureObj<'b, Result<Vec<TimeSegment>>> {

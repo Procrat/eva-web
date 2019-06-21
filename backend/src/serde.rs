@@ -73,6 +73,21 @@ struct ScheduledTask {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
+pub struct NewTimeSegmentWrapper(
+    #[serde(with = "NewTimeSegment")] pub eva::time_segment::NewNamedTimeSegment,
+);
+
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(remote = "eva::time_segment::NewNamedTimeSegment")]
+struct NewTimeSegment {
+    name: String,
+    ranges: Vec<Range<DateTime<Utc>>>,
+    start: DateTime<Utc>,
+    #[serde(with = "duration_in_seconds")]
+    period: Duration,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct TimeSegmentWrapper(
     #[serde(with = "TimeSegment")] pub eva::time_segment::NamedTimeSegment,
 );

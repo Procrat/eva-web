@@ -53,7 +53,7 @@ export class Database {
     }
   }
 
-  async put(id, type, document) {
+  async create(document, type, id) {
     const response = await this.pouch.put({
       ...document,
       _id: id.toString(),
@@ -64,12 +64,44 @@ export class Database {
     return response;
   }
 
-  async get(id) {
-    return this.pouch.get(id);
+  async update(document, type, rev) {
+    const response = await this.pouch.put({
+      ...document,
+      _id: document.id.toString(),
+      _rev: rev,
+      id: undefined,
+      type,
+    });
+    console.assert(response.ok);
+    return response;
   }
 
-  async remove(document) {
-    return this.pouch.remove(document);
+  async updateRegardlessOfRev(id, document, type) {
+    const oldDocument = await this.get(id);
+    return this.update(document, type, oldDocument._rev);
+  }
+
+  async get(id) {
+    return this.pouch.get(id.toString());
+  }
+
+  async delete(document, type, rev) {
+    const response = this.pouch.remove({
+      ...document,
+      _id: document.id.toString(),
+      _rev: rev,
+      id: undefined,
+      type,
+    });
+    console.assert(response.ok);
+    return response;
+  }
+
+  async deleteRegardlessOfRev(id) {
+    const document = await this.get(id);
+    const response = this.pouch.remove(document);
+    console.assert(response.ok);
+    return response;
   }
 
   async allTasks() {
@@ -80,6 +112,16 @@ export class Database {
       console.warn(`Fetching tasks issued a warning: ${response.warning}`);
     }
     return response.docs;
+  }
+
+  async tasksForTimeSegment(timeSegmentId) {
+    const tasksResponse = await this.pouch.find({
+      selector: { type: 'task', time_segment_id: timeSegmentId },
+    });
+    if (tasksResponse.warning) {
+      console.warn(`Fetching tasks issued a warning: ${tasksResponse.warning}`);
+    }
+    return tasksResponse.docs;
   }
 
   async allTasksPerTimeSegment() {

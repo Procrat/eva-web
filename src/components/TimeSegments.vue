@@ -2,30 +2,45 @@
   <el-card>
     <h1>Time segments</h1>
     <div v-if="allSegmentsValid">
-      <radio
-        v-for="segment in timeSegments"
-        :key="segment.uniqueId"
-        v-model="selectedSegment"
-        :value="segment"
-        :label="segment.uniqueId"
-        :selected-label.sync="selectedSegmentLabel"
-        group-name="segment"
-        :color="segment.color.darken(0.3)"
-        class="segment"
-      >
-        <el-input
-          :ref="`input-${segment.uniqueId}`"
-          v-model="segment.name"
-          class="segment-name"
-          @focus="$refs[`input-${segment.uniqueId}`][0].$parent.select()"
+      <el-row>
+        <radio
+          v-for="segment in timeSegments"
+          :key="segment.uniqueId"
+          v-model="selectedSegment"
+          :value="segment"
+          :label="segment.uniqueId"
+          :selected-label.sync="selectedSegmentLabel"
+          group-name="segment"
+          :color="segment.color.darken(0.3)"
+          class="segment"
+        >
+          <el-input
+            :ref="`input-${segment.uniqueId}`"
+            v-model="segment.name"
+            class="segment-name"
+            @focus="$refs[`input-${segment.uniqueId}`][0].$parent.select()"
+          />
+        </radio>
+        <el-button
+          circle
+          icon="el-icon-plus"
+          class="add-segment-btn"
+          @click="addTimeSegment"
         />
-      </radio>
-      <el-button
-        circle
-        icon="el-icon-plus"
-        class="add-segment-btn"
-        @click="addTimeSegment"
-      />
+      </el-row>
+      <el-row
+        v-if="changed"
+        type="flex"
+        justify="center"
+      >
+        <el-button
+          type="primary"
+          icon="el-icon-check"
+          @click="save"
+        >
+          Save
+        </el-button>
+      </el-row>
     </div>
     <el-alert
       v-else
@@ -71,6 +86,7 @@ export default {
       timeSegments: [],
       selectedSegment: null,
       selectedSegmentLabel: null,
+      changed: false,
     };
   },
 
@@ -91,12 +107,21 @@ export default {
     },
   },
 
+  watch: {
+    timeSegments: {
+      handler() {
+        this.changed = true;
+      },
+      deep: true,
+    },
+  },
+
   created() {
-    this.refetchTimeSegments();
+    this.refetch();
   },
 
   methods: {
-    async refetchTimeSegments() {
+    async refetch() {
       try {
         this.timeSegments = await this.$api.listTimeSegments();
       } catch (error) {
@@ -115,6 +140,29 @@ export default {
       this.selectedSegment.start = DateTime.firstDayOfWeek(0);
       this.selectedSegment.ranges = selections
         .flatMap(selection => selection.toSegmentRanges(this.selectedSegment));
+    },
+
+    async save() {
+      try {
+        const oldTimeSegments = await this.$api.listTimeSegments();
+        const oldSegmentsMap = new Map(oldTimeSegments.map(segment => [segment.id, segment]));
+        this.timeSegments.forEach((segment) => {
+          if (oldSegmentsMap.get(segment.id) == null) {
+            this.$api.addTimeSegment(segment);
+          } else {
+            this.$api.updateTimeSegment(segment);
+            oldSegmentsMap.delete(segment.id);
+          }
+        });
+        for (const segment of oldSegmentsMap.values()) {
+          this.$api.deleteTimeSegment(segment);
+        }
+        this.changed = false;
+        this.$message.success('Saved!');
+      } catch (error) {
+        console.error(error);
+        this.$message.error(error.toString());
+      }
     },
   },
 };
