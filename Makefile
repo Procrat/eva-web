@@ -1,5 +1,5 @@
 RUST_TARGET=wasm32-unknown-unknown
-RUST_CHANNEL=nightly-2019-03-02
+RUST_CHANNEL=nightly-2019-06-20
 BINDGEN_OPTS=--no-typescript
 
 

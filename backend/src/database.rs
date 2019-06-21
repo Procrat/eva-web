@@ -1,17 +1,16 @@
 use eva::database::{Database as DatabaseT, Error, Result};
-use eva::time_segment::NamedTimeSegment as TimeSegment;
-use futures::compat::Future01CompatExt;
+use eva::time_segment::{NamedTimeSegment as TimeSegment, NewNamedTimeSegment as NewTimeSegment};
 use futures::future::LocalFutureObj;
 use js_sys::Promise;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
-use wasm_bindgen_futures::JsFuture;
+use wasm_bindgen_futures::futures_0_3::JsFuture;
 
 use crate::serde;
 
 macro_rules! js_await {
     ($promise:expr) => {
-        await!(JsFuture::from($promise).compat()).map_err(|error| parse_error(error))
+        await!(JsFuture::from($promise)).map_err(|error| parse_error(error))
     };
 }
 
@@ -21,7 +20,7 @@ pub async fn database() -> crate::Result<impl DatabaseT> {
     Ok(Database::from(result))
 }
 
-#[wasm_bindgen(module = "./../../src/database")]
+#[wasm_bindgen(raw_module = "../../src/database")]
 extern "C" {
     pub type Database;
 
@@ -65,7 +64,7 @@ impl DatabaseT for Database {
         LocalFutureObj::new(Box::new(future))
     }
 
-    fn remove_task<'a: 'b, 'b>(&'a self, id: u32) -> LocalFutureObj<'b, Result<()>> {
+    fn delete_task<'a: 'b, 'b>(&'a self, id: u32) -> LocalFutureObj<'b, Result<()>> {
         let future = async move {
             let document = js_await!(self.get(format!("{}", id)))
                 .map_err(|e| Error("while removing a task", e))?;
@@ -76,7 +75,7 @@ impl DatabaseT for Database {
         LocalFutureObj::new(Box::new(future))
     }
 
-    fn find_task<'a: 'b, 'b>(&'a self, _id: u32) -> LocalFutureObj<'b, Result<eva::Task>> {
+    fn get_task<'a: 'b, 'b>(&'a self, _id: u32) -> LocalFutureObj<'b, Result<eva::Task>> {
         unimplemented!()
     }
 
@@ -116,6 +115,31 @@ impl DatabaseT for Database {
                 .collect())
         };
         LocalFutureObj::new(Box::new(future))
+    }
+
+    fn add_time_segment<'a: 'b, 'b>(
+        &'a self,
+        time_segment: NewTimeSegment,
+    ) -> LocalFutureObj<'b, Result<()>> {
+        unimplemented!()
+    }
+
+    fn delete_time_segment<'a: 'b, 'b>(
+        &'a self,
+        time_segment: TimeSegment,
+    ) -> LocalFutureObj<'b, Result<()>> {
+        unimplemented!()
+    }
+
+    fn update_time_segment<'a: 'b, 'b>(
+        &'a self,
+        time_segment: TimeSegment,
+    ) -> LocalFutureObj<'b, Result<()>> {
+        unimplemented!()
+    }
+
+    fn all_time_segments<'a: 'b, 'b>(&'a self) -> LocalFutureObj<'b, Result<Vec<TimeSegment>>> {
+        unimplemented!()
     }
 }
 

@@ -1,4 +1,3 @@
-#![feature(futures_api)]
 #![feature(async_await, await_macro)]
 
 use futures::prelude::*;
@@ -26,7 +25,7 @@ pub fn add_task(new_task_json: JsValue) -> Promise {
         .map(|x| x.0);
     let future_added_task = async {
         let config = await!(configuration())?;
-        await!(eva::add(&config, new_task?).map_err(Error::from))
+        await!(eva::add_task(&config, new_task?).map_err(Error::from))
     };
     promisify_future::<eva::Task, serde::TaskWrapper, _>(future_added_task)
 }
@@ -35,7 +34,7 @@ pub fn add_task(new_task_json: JsValue) -> Promise {
 pub fn list_tasks() -> Promise {
     let future_tasks = async {
         let config = await!(configuration())?;
-        let tasks = await!(eva::all(&config).map_err(Error::from))?;
+        let tasks = await!(eva::tasks(&config).map_err(Error::from))?;
         Ok(tasks
             .into_iter()
             .map(serde::TaskWrapper)
@@ -48,7 +47,7 @@ pub fn list_tasks() -> Promise {
 pub fn remove_task(id: u32) -> Promise {
     let future = async move {
         let config = await!(configuration())?;
-        Ok(await!(eva::remove(&config, id))?)
+        Ok(await!(eva::delete_task(&config, id))?)
     };
     promisify_future::<(), (), _>(future)
 }
@@ -67,13 +66,11 @@ where
     With: ::serde::Serialize + From<Item>,
     F: Future<Output = Result<Item>> + 'static,
 {
-    wasm_bindgen_futures::future_to_promise(
+    wasm_bindgen_futures::futures_0_3::future_to_promise(
         future
             .and_then(|value: Item| {
                 future::ready(JsValue::from_serde(&With::from(value))).err_into::<Error>()
             })
-            .map_err(|error: Error| format!("{}", error).into())
-            .boxed()
-            .compat(),
+            .map_err(|error: Error| format!("{}", error).into()),
     )
 }
