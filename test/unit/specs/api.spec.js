@@ -3,19 +3,14 @@ import { expect } from 'chai';
 import PouchDB from 'pouchdb';
 
 import api from '@/api';
-
-
-function addHours(date, hours) {
-  date.setHours(date.getHours() + hours);
-  return date;
-}
+import * as DateTime from '@/datetime';
 
 
 function sampleDate() {
-  const deadline = new Date();
+  const date = new Date();
   // We don't store milliseconds, so let's round it so we can compare with it.
-  deadline.setMilliseconds(0);
-  return deadline;
+  date.setMilliseconds(0);
+  return date;
 }
 
 
@@ -38,8 +33,8 @@ function sampleNewTimeSegment() {
     start,
     period: 7 * 42 * 60 * 60,
     ranges: [{
-      start: addHours(start, 24),
-      end: addHours(start, 27),
+      start: DateTime.addHours(start, 24),
+      end: DateTime.addHours(start, 27),
     }],
   };
 }
@@ -142,12 +137,12 @@ describe('api', () => {
     it('should return a schedule with exactly the tasks I added', async function _() {
       const task1 = sampleNewTask({
         content: 'task1',
-        deadline: addHours(sampleDate(), 5),
+        deadline: DateTime.addHours(DateTime.tomorrow(), 18),
       });
       const addedTask1 = await this.$api.addTask(task1);
       const task2 = sampleNewTask({
         content: 'task2',
-        deadline: addHours(sampleDate(), 4),
+        deadline: DateTime.addHours(DateTime.tomorrow(), 10),
       });
       const addedTask2 = await this.$api.addTask(task2);
 
@@ -219,12 +214,17 @@ describe('api', () => {
       const segments = await this.$api.listTimeSegments();
       expect(segments).to.have.lengthOf(1);
       const segment = segments[0];
-      expect(segment.id).to.equal(0);
-      expect(segment.name).to.equal('Default');
-      expect(segment.ranges).to.have.lengthOf(1);
+      expect(segment).to.include({
+        id: 0,
+        name: 'Default',
+        period: 7 * 24 * 60 * 60,
+      });
+      expect(segment).to.have.property('ranges').that.has.lengthOf(7);
+      segment.ranges.forEach((range) => {
+        expect(range.start.getHours()).to.equal(9);
+        expect(range.end.getHours()).to.equal(17);
+      });
       expect(segment.start.getTime()).to.equal(segment.ranges[0].start.getTime());
-      expect(segment.ranges[0].end.getTime())
-        .to.equal(segment.start.getTime() + segment.period * 1000);
       expect(segment.uniqueId).to.be.a('string');
       expect(segment.color).to.be.an.instanceof(Color);
     });

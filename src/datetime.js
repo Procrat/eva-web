@@ -13,11 +13,17 @@ function copy(date) {
   return new Date(date.getTime());
 }
 
+export function addHours(datetime, hours) {
+  const newDatetime = copy(datetime);
+  newDatetime.setHours(datetime.getHours() + hours);
+  return newDatetime;
+}
+
 export function today() {
   return stripTime(new Date());
 }
 
-function addDays(date, days) {
+export function addDays(date, days) {
   const newDate = copy(date);
   newDate.setDate(date.getDate() + days);
   return newDate;
