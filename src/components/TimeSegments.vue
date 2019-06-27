@@ -3,37 +3,52 @@
     <h1>Time segments</h1>
     <div v-if="allSegmentsValid">
       <el-row>
-        <radio
-          v-for="segment in timeSegments"
-          :key="segment.uniqueId"
-          v-model="selectedSegment"
-          :value="segment"
-          :label="segment.uniqueId"
-          :selected-label.sync="selectedSegmentLabel"
-          group-name="segment"
-          :color="segment.color.darken(0.3)"
-          class="segment"
-        >
-          <el-input
-            :ref="`input-${segment.uniqueId}`"
-            v-model="segment.name"
-            class="segment-name"
-            @focus="$refs[`input-${segment.uniqueId}`][0].$parent.select()"
-          />
-        </radio>
-        <el-button
-          circle
-          icon="el-icon-plus"
-          class="add-segment-btn"
-          @click="addTimeSegment"
-        />
+        <template v-for="segment in timeSegments">
+          <span
+            :key="segment.uniqueId"
+            class="segment"
+          >
+            <radio
+              v-model="selectedSegment"
+              :value="segment"
+              :label="segment.uniqueId"
+              :selected-label.sync="selectedSegmentLabel"
+              group-name="segment"
+              :color="segment.color.darken(0.3)"
+              class="segment-radio"
+            >
+              <el-input
+                :ref="`input-${segment.uniqueId}`"
+                v-model="segment.name"
+                class="segment-name"
+                @focus="$refs[`input-${segment.uniqueId}`][0].$parent.select()"
+              />
+            </radio>
+            <el-button
+              circle
+              size="mini"
+              icon="el-icon-delete"
+              @click="deleteTimeSegment(segment)"
+            />
+          </span>
+          <!-- Since whitespace is otherwise stripped and the span above is
+          unbreakable, this allows for a line breaking point -->
+          {{ ' ' }}
+        </template>
       </el-row>
       <el-row
-        v-if="changed"
         type="flex"
         justify="center"
       >
         <el-button
+          icon="el-icon-plus"
+          class="add-segment-btn"
+          @click="addTimeSegment"
+        >
+          Add
+        </el-button>
+        <el-button
+          v-if="changed"
           type="primary"
           icon="el-icon-check"
           @click="save"
@@ -136,6 +151,11 @@ export default {
       this.timeSegments.push(newSegment);
     },
 
+    deleteTimeSegment(segment) {
+      const index = this.timeSegments.findIndex(segment_ => segment_.id === segment.id);
+      this.timeSegments.splice(index, 1);
+    },
+
     onSelectionChanged(selections) {
       this.selectedSegment.start = DateTime.firstDayOfWeek(0);
       this.selectedSegment.ranges = selections
@@ -171,11 +191,16 @@ export default {
 
 <style lang="sass" scoped>
 .segment
-  height: inherit
-  padding: 12px 20px 12px 10px
+  white-space: nowrap;
+  margin: 0px 15px
 
-  .segment-name
-    max-width: 200px
+  .segment-radio
+    height: inherit
+    padding: 12px 20px 12px 10px
+    margin-right: 0px
+
+    .segment-name
+      max-width: 200px
 
 .add-segment-btn
   display: inline-block

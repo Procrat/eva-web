@@ -93,7 +93,7 @@ export class Database {
   }
 
   async delete(document, type, rev) {
-    const response = this.pouch.remove({
+    const response = await this.pouch.remove({
       ...document,
       _id: document.id.toString(),
       _rev: rev,
@@ -106,7 +106,7 @@ export class Database {
 
   async deleteRegardlessOfRev(id) {
     const document = await this.get(id);
-    const response = this.pouch.remove(document);
+    const response = await this.pouch.remove(document);
     console.assert(response.ok);
     return response;
   }
