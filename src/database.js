@@ -1,6 +1,8 @@
 import PouchDB from 'pouchdb';
 import PouchDBFind from 'pouchdb-find';
 
+import * as DateTime from '@/datetime';
+
 PouchDB.plugin(PouchDBFind);
 
 
@@ -19,20 +21,25 @@ export class Database {
   async migrate() {
     const version = await this.getVersion();
     if (version === 0) {
+      // Set the default time segment for all tasks
       const oldTasks = (await this.pouch.allDocs({ include_docs: true })).rows.map(row => row.doc);
       const newTasks = oldTasks.map(task => ({ ...task, type: 'task', time_segment_id: 0 }));
       await this.pouch.bulkDocs(newTasks);
-      const timeSegmentStart = new Date();
-      const aWeekInSeconds = 7 * 24 * 60 * 60;
-      const timeSegmentEnd = new Date(timeSegmentStart.getTime() + aWeekInSeconds * 1000);
+      // Add the default time segment itself
+      const timeSegmentStart = new Date(2019, 0, 1, 9); // 9 o'clock on some day
+      const ranges = Array.from({ length: 7 }, (_, i) => {
+        const start = DateTime.addDays(timeSegmentStart, i);
+        return [start, DateTime.addHours(start, 8)];
+      });
       await this.pouch.put({
         _id: '0',
         type: 'time-segment',
         name: 'Default',
         start: timeSegmentStart.toISOString(),
-        period: aWeekInSeconds,
-        ranges: [[timeSegmentStart.toISOString(), timeSegmentEnd.toISOString()]],
+        period: 7 * 24 * 60 * 60,
+        ranges,
       });
+      // Create some indices
       await this.pouch.createIndex({ index: { fields: ['type'] } });
       await this.pouch.createIndex({ index: { fields: ['_id', 'type'] } });
       await this.pouch.createIndex({ index: { fields: ['time_segment_id', 'type'] } });
