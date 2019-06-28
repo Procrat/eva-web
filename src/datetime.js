@@ -109,8 +109,7 @@ export function formatDatetime(datetime) {
     dateStr = `${date.getDate()}/${date.getMonth() + 1}`;
   }
 
-  let timeStr = `${datetime.getHours()}:\
-    ${datetime.getMinutes().toString().padStart(2, '0')}`;
+  let timeStr = `${datetime.getHours()}:${datetime.getMinutes().toString().padStart(2, '0')}`;
   if (timeStr === '23:59') {
     timeStr = '';
   }
