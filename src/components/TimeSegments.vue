@@ -166,22 +166,25 @@ export default {
       try {
         const oldTimeSegments = await this.$api.listTimeSegments();
         const oldSegmentsMap = new Map(oldTimeSegments.map(segment => [segment.id, segment]));
+        const promises = [];
         this.timeSegments.forEach((segment) => {
           if (oldSegmentsMap.get(segment.id) == null) {
-            this.$api.addTimeSegment(segment);
+            promises.push(this.$api.addTimeSegment(segment));
           } else {
-            this.$api.updateTimeSegment(segment);
+            promises.push(this.$api.updateTimeSegment(segment));
             oldSegmentsMap.delete(segment.id);
           }
         });
         for (const segment of oldSegmentsMap.values()) {
-          this.$api.deleteTimeSegment(segment);
+          promises.push(this.$api.deleteTimeSegment(segment));
         }
+        await Promise.all(promises);
         this.changed = false;
         this.$message.success('Saved!');
       } catch (error) {
         console.error(error);
         this.$message.error(error.toString());
+        this.refetch();
       }
     },
   },
