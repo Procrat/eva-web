@@ -26,8 +26,10 @@
             </radio>
             <el-button
               circle
+              plain
               size="mini"
               icon="el-icon-delete"
+              type="danger"
               @click="deleteTimeSegment(segment)"
             />
           </span>
