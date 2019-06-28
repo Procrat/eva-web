@@ -133,8 +133,11 @@ export default {
 
   watch: {
     timeSegments: {
-      handler() {
-        this.changed = true;
+      handler(newSegments, oldSegments) {
+        // Only set to changed when we don't have an entirely new list, which
+        // would mean we just did a refetch from the database, in which case a
+        // save button is unnecessary.
+        this.changed = Object.is(newSegments, oldSegments);
       },
       deep: true,
     },
@@ -189,13 +192,12 @@ export default {
           promises.push(this.$api.deleteTimeSegment(segment));
         }
         await Promise.all(promises);
-        this.changed = false;
         this.$message.success('Saved!');
       } catch (error) {
         console.error(error);
         this.$message.error(error.toString());
-        this.refetch();
       }
+      await this.refetch();
     },
   },
 };
