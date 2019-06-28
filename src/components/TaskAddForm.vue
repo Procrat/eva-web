@@ -55,6 +55,26 @@
         />
       </el-form-item>
 
+      <el-form-item
+        ref="timeSegment"
+        prop="timeSegmentId"
+      >
+        <el-select
+          v-model="timeSegmentId"
+          filterable
+          default-first-option
+          placeholder="Time Segment"
+          class="time-segment"
+        >
+          <el-option
+            v-for="timeSegment in timeSegments"
+            :key="timeSegment.uniqueId"
+            :label="formatTimeSegment(timeSegment)"
+            :value="timeSegment.id"
+          />
+        </el-select>
+      </el-form-item>
+
       <el-row
         type="flex"
         justify="center"
@@ -100,63 +120,42 @@ export default {
       disabledDate(date) {
         return date <= new Date();
       },
-      shortcuts: [
-        {
-          text: 'Today',
-          onClick(picker) {
-            picker.$emit('pick', DateTime.endOfDay(DateTime.today()));
-          },
-        }, {
-          text: 'Tomorrow',
-          onClick(picker) {
-            picker.$emit('pick', DateTime.endOfDay(DateTime.tomorrow()));
-          },
-        }, {
-          text: 'This week',
-          onClick(picker) {
-            picker.$emit('pick', DateTime.endOfDay(DateTime.firstDayOfWeek(6)));
-          },
-        }, {
-          text: '+1 week',
-          onClick(picker) {
-            picker.$emit('pick', DateTime.endOfDay(DateTime.inNWeeks(1)));
-          },
-        }, {
-          text: '+2 weeks',
-          onClick(picker) {
-            picker.$emit('pick', DateTime.endOfDay(DateTime.inNWeeks(2)));
-          },
-        }, {
-          text: 'This month',
-          onClick(picker) {
-            picker.$emit('pick', DateTime.endOfDay(DateTime.lastDayOfMonth()));
-          },
-        }, {
-          text: '+1 month',
-          onClick(picker) {
-            picker.$emit('pick', DateTime.endOfDay(DateTime.inNMonths(1)));
-          },
+      shortcuts: [{
+        text: 'Today',
+        onClick(picker) {
+          picker.$emit('pick', DateTime.endOfDay(DateTime.today()));
         },
-      ],
-    },
-
-    formRules: {
-      content: [{ required: true, trigger: 'change', message: 'You didn\'t say what it is you want to achieve.' }],
-      deadline: [
-        { required: true, trigger: 'change', message: 'You didn\'t mention when it\'s due.' },
-        {
-          validator: (rule, value, callback) => {
-            if (value <= new Date()) {
-              callback(new Error('The deadline you specified is in the past.'));
-            } else {
-              callback();
-            }
-          },
-          trigger: 'change',
+      }, {
+        text: 'Tomorrow',
+        onClick(picker) {
+          picker.$emit('pick', DateTime.endOfDay(DateTime.tomorrow()));
         },
-      ],
-      durationMinutes: [{ required: true, trigger: 'change', message: 'You didn\'t mention how long you think it would take.' }],
-      importance: [{ required: true, trigger: 'change' }],
+      }, {
+        text: 'This week',
+        onClick(picker) {
+          picker.$emit('pick', DateTime.endOfDay(DateTime.firstDayOfWeek(6)));
+        },
+      }, {
+        text: '+1 week',
+        onClick(picker) {
+          picker.$emit('pick', DateTime.endOfDay(DateTime.inNWeeks(1)));
+        },
+      }, {
+        text: '+2 weeks',
+        onClick(picker) {
+          picker.$emit('pick', DateTime.endOfDay(DateTime.inNWeeks(2)));
+        },
+      }, {
+        text: 'This month',
+        onClick(picker) {
+          picker.$emit('pick', DateTime.endOfDay(DateTime.lastDayOfMonth()));
+        },
+      }, {
+        text: '+1 month',
+        onClick(picker) {
+          picker.$emit('pick', DateTime.endOfDay(DateTime.inNMonths(1)));
+        },
+      }],
     },
   },
 
@@ -166,7 +165,56 @@ export default {
       deadline: null,
       durationMinutes: null,
       importance: 5,
+      timeSegmentId: null,
+      timeSegments: [],
+
+      formRules: {
+        content: [{
+          required: true,
+          trigger: 'change',
+          message: 'You didn\'t say what it is you want to achieve.',
+        }],
+        deadline: [{
+          required: true,
+          trigger: 'change',
+          message: 'You didn\'t mention when it\'s due.',
+        }, {
+          validator: (_rule, value, callback) => {
+            if (value <= new Date()) {
+              callback(new Error('The deadline you specified is in the past.'));
+            } else {
+              callback();
+            }
+          },
+          trigger: 'change',
+        }],
+        durationMinutes: [{
+          required: true,
+          trigger: 'change',
+          message: 'You didn\'t mention how long you think it would take.',
+        }],
+        importance: [{ required: true, trigger: 'change' }],
+        timeSegmentId: [{
+          required: true,
+          message: 'You didn\'t select a time segment.',
+        }, {
+          validator: (_rule, value, callback) => {
+            if (this.timeSegments.find(segment => segment.id === this.timeSegmentId) == null) {
+              callback(new Error('The segment you selected doesn\'t exist.'));
+            } else {
+              callback();
+            }
+          },
+        }],
+      },
     };
+  },
+
+  created() {
+    this.bus.$on('time-segments-changed', () => {
+      this.fetchTimeSegments();
+    });
+    this.fetchTimeSegments();
   },
 
   methods: {
@@ -190,7 +238,7 @@ export default {
         deadline: this.deadline,
         duration: this.durationMinutes * 60,
         importance: this.importance,
-        time_segment_id: 0,
+        time_segment_id: this.timeSegmentId,
       };
 
       try {
@@ -203,8 +251,44 @@ export default {
       }
     },
 
+    async fetchTimeSegments() {
+      try {
+        this.timeSegments = await this.$api.listTimeSegments();
+        await this.setFallbackTimeSegment();
+      } catch (error) {
+        console.error(error);
+        this.$message.error(error.toString());
+      }
+    },
+
+    async setFallbackTimeSegment() {
+      if (!(await this.isTimeSegmentIdValid())
+          && this.timeSegments.length > 0) {
+        this.timeSegmentId = this.timeSegments[0].id;
+      }
+    },
+
+    async isTimeSegmentIdValid() {
+      return this.timeSegmentId != null
+        && new Promise((resolve, _reject) => {
+          this.$refs.timeSegment.validate('', (_message, erroneousFields) => {
+            resolve(erroneousFields != null);
+          });
+        });
+    },
+
     formatImportance(importance) {
       return `Importance: ${importance}`;
+    },
+
+    formatTimeSegment(timeSegment) {
+      if (timeSegment.name === 'Default') {
+        return 'Default time segment';
+      }
+      if (!timeSegment.name) {
+        return '(unnamed)';
+      }
+      return timeSegment.name;
     },
   },
 };
@@ -213,6 +297,6 @@ export default {
 
 <style lang="sass" scoped>
 .add-task-form
-  .duration, .deadline
+  .duration, .deadline, .time-segment
     width: 100% !important
 </style>

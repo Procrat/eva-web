@@ -96,6 +96,13 @@ export default {
     TimeSegmentPicker,
   },
 
+  props: {
+    bus: {
+      type: Object,
+      required: true,
+    },
+  },
+
   data() {
     return {
       timeSegments: [],
@@ -139,6 +146,7 @@ export default {
     async refetch() {
       try {
         this.timeSegments = await this.$api.listTimeSegments();
+        this.bus.$emit('time-segments-changed');
       } catch (error) {
         console.error(error);
         this.$message.error(error.toString());

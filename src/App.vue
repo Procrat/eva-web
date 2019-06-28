@@ -42,7 +42,7 @@ import TimeSegments from '@/components/TimeSegments';
 const bus = new Vue();
 const routes = [
   { path: '/', component: Schedule, props: { bus } },
-  { path: '/time-segments', component: TimeSegments },
+  { path: '/time-segments', component: TimeSegments, props: { bus } },
 ];
 
 export default {
