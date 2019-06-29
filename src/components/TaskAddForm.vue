@@ -245,7 +245,7 @@ export default {
       try {
         await this.$api.addTask(task);
         this.$message.success('Task added!');
-        this.$refs.form.resetFields();
+        this.resetFields();
         this.bus.$emit('task-added');
       } catch (error) {
         this.$message.error(error);
@@ -290,6 +290,12 @@ export default {
         return '(unnamed)';
       }
       return timeSegment.name;
+    },
+
+    resetFields() {
+      const oldTimeSegmentId = this.timeSegmentId;
+      this.$refs.form.resetFields();
+      this.timeSegmentId = oldTimeSegmentId;
     },
   },
 };
