@@ -58,6 +58,7 @@
       <el-form-item
         ref="timeSegment"
         prop="timeSegmentId"
+        :class="{ hidden: timeSegments.length <= 1 }"
       >
         <el-select
           v-model="timeSegmentId"
@@ -299,4 +300,7 @@ export default {
 .add-task-form
   .duration, .deadline, .time-segment
     width: 100% !important
+
+.hidden
+  display: none
 </style>
