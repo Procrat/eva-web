@@ -161,7 +161,7 @@ export class Selection {
       let startDay = new Day((start.getDay() + 6) % 7); // Sunday-indexed -> Monday-indexed
       const endDay = new Day((end.getDay() + 6) % 7); // Sunday-indexed -> Monday-indexed
       let startTime = new Time(start.getHours());
-      let endTime = new Time(end.getHours() - (end.getMinutes() === 0 ? 1 : 0));
+      let endTime = new Time((end.getHours() - (end.getMinutes() === 0 ? 1 : 0) + 24) % 24);
       if (end - start === DateTime.oneWeekInMs) {
         endTime = endTime.previousHour();
       }
