@@ -151,6 +151,8 @@ export default {
     async refetch() {
       try {
         this.timeSegments = await this.$api.listTimeSegments();
+        this.selectedSegment = null;
+        this.selectedSegmentLabel = null;
         this.bus.$emit('time-segments-changed');
       } catch (error) {
         console.error(error);
