@@ -324,6 +324,7 @@ table
   max-width: 100%
   table-layout: fixed
   user-select: none
+  touch-action: none
 
 caption
   font-size: 12px
