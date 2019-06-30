@@ -162,6 +162,9 @@ export default {
       const nextMonday = DateTime.firstDayOfWeek(0);
       const newSegment = new TimeSegment(undefined, '', nextMonday, [], DateTime.oneWeekInS);
       this.timeSegments.push(newSegment);
+      this.$nextTick(() => {
+        this.$refs[`input-${newSegment.uniqueId}`][0].focus();
+      });
     },
 
     deleteTimeSegment(segment) {
