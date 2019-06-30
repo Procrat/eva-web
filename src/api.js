@@ -44,8 +44,8 @@ function parseTimeSegment(timeSegment) {
 }
 
 
-function jsApi(wasmApi) {
-  wasmApi.initialize();
+async function jsApi(wasmApi) {
+  await wasmApi.initialize();
 
   return {
     async addTask(task) {
@@ -91,7 +91,10 @@ function jsApi(wasmApi) {
 
 
 export default async function () {
-  return API
-    .then(jsApi)
-    .catch(console.error);
+  try {
+    return jsApi(await API);
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
 }

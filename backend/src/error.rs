@@ -8,6 +8,8 @@ pub enum Error {
     Eva(#[cause] eva::Error),
     #[fail(display = "A database error occurred {}: {}", _0, _1)]
     Database(&'static str, #[cause] failure::Error),
+    #[fail(display = "{}", _0)]
+    Configuration(String),
 }
 
 impl From<serde_json::Error> for Error {

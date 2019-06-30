@@ -1,4 +1,5 @@
 #![feature(async_await, await_macro)]
+#![feature(try_blocks)]
 
 use futures::prelude::*;
 use js_sys::Promise;
@@ -13,9 +14,11 @@ pub(crate) mod database;
 pub(crate) mod error;
 pub(crate) mod serde;
 
+
 #[wasm_bindgen]
-pub fn initialize() {
+pub fn initialize() -> Promise {
     console_error_panic_hook::set_once();
+    promisify_future::<(), (), _>(configuration::init_configuration())
 }
 
 #[wasm_bindgen]
@@ -24,8 +27,7 @@ pub fn add_task(new_task_json: JsValue) -> Promise {
         .into_serde::<serde::NewTaskWrapper>()
         .map(|x| x.0);
     let future_added_task = async {
-        let config = await!(configuration())?;
-        Ok(await!(eva::add_task(&config, new_task?))?)
+        Ok(await!(eva::add_task(configuration()?, new_task?))?)
     };
     promisify_future::<eva::Task, serde::TaskWrapper, _>(future_added_task)
 }
@@ -33,8 +35,7 @@ pub fn add_task(new_task_json: JsValue) -> Promise {
 #[wasm_bindgen]
 pub fn remove_task(id: u32) -> Promise {
     let future = async move {
-        let config = await!(configuration())?;
-        Ok(await!(eva::delete_task(&config, id))?)
+        Ok(await!(eva::delete_task(configuration()?, id))?)
     };
     promisify_future::<(), (), _>(future)
 }
@@ -42,8 +43,7 @@ pub fn remove_task(id: u32) -> Promise {
 #[wasm_bindgen]
 pub fn list_tasks() -> Promise {
     let future_tasks = async {
-        let config = await!(configuration())?;
-        let tasks = await!(eva::tasks(&config))?;
+        let tasks = await!(eva::tasks(configuration()?))?;
         Ok(tasks
             .into_iter()
             .map(serde::TaskWrapper)
@@ -55,8 +55,7 @@ pub fn list_tasks() -> Promise {
 #[wasm_bindgen]
 pub fn schedule() -> Promise {
     let future_schedule = async {
-        let config = await!(configuration())?;
-        Ok(await!(eva::schedule(&config, "importance"))?)
+        Ok(await!(eva::schedule(configuration()?, "importance"))?)
     };
     promisify_future::<eva::Schedule<eva::Task>, serde::ScheduleWrapper, _>(future_schedule)
 }
@@ -67,8 +66,7 @@ pub fn add_time_segment(new_segment_json: JsValue) -> Promise {
         .into_serde::<serde::NewTimeSegmentWrapper>()
         .map(|x| x.0);
     let future = async {
-        let config = await!(configuration())?;
-        Ok(await!(eva::add_time_segment(&config, new_segment?))?)
+        Ok(await!(eva::add_time_segment(configuration()?, new_segment?))?)
     };
     promisify_future::<(), (), _>(future)
 }
@@ -79,8 +77,7 @@ pub fn delete_time_segment(segment_json: JsValue) -> Promise {
         .into_serde::<serde::TimeSegmentWrapper>()
         .map(|x| x.0);
     let future = async {
-        let config = await!(configuration())?;
-        Ok(await!(eva::delete_time_segment(&config, segment?))?)
+        Ok(await!(eva::delete_time_segment(configuration()?, segment?))?)
     };
     promisify_future::<(), (), _>(future)
 }
@@ -91,8 +88,7 @@ pub fn update_time_segment(segment_json: JsValue) -> Promise {
         .into_serde::<serde::TimeSegmentWrapper>()
         .map(|x| x.0);
     let future = async {
-        let config = await!(configuration())?;
-        Ok(await!(eva::update_time_segment(&config, segment?))?)
+        Ok(await!(eva::update_time_segment(configuration()?, segment?))?)
     };
     promisify_future::<(), (), _>(future)
 }
@@ -100,8 +96,7 @@ pub fn update_time_segment(segment_json: JsValue) -> Promise {
 #[wasm_bindgen]
 pub fn list_time_segments() -> Promise {
     let future_segments = async {
-        let config = await!(configuration())?;
-        let segments = await!(eva::time_segments(&config))?;
+        let segments = await!(eva::time_segments(configuration()?))?;
         Ok(segments
             .into_iter()
             .map(serde::TimeSegmentWrapper)
