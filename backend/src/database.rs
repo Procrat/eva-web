@@ -157,19 +157,38 @@ impl DatabaseT for Database {
         time_segment: TimeSegment,
     ) -> LocalFutureObj<'b, Result<()>> {
         let future = async move {
-            // Assert that this segment doesn't have any tasks associated with it
+            // Assert that there are no tasks in this time segment
             let tasks: Array = js_await!(self.tasksForTimeSegment(time_segment.id))
                 .map_err(|e| Error("while fetching tasks for a time segment", e))?
                 .into();
             if tasks.length() > 0 {
                 Err(Error(
                     "while deleting a time segment",
-                    failure::err_msg(
-                        "There are still tasks associated with this time segment. Please delete \
-                         them or move them to another segment.",
+                    failure::format_err!(
+                        "There {} in this time segment. Please delete them or move them to \
+                         another segment before deleting this segment.",
+                        if tasks.length() == 1 {
+                            "is still a task".to_string()
+                        } else {
+                            format!("are still {} tasks", tasks.length())
+                        },
                     ),
                 ))?;
             }
+
+            // Assert that this isn't the last time segment
+            let time_segments: Array = js_await!(self.allTimeSegments())
+                .map_err(|e| Error("while deleting a time segments", e))?
+                .into();
+            if time_segments.length() <= 1 {
+                Err(Error(
+                    "while trying to delete a time segment",
+                    failure::format_err!(
+                        "If you remove the last time segment, when should I schedule things?"
+                    ),
+                ))?
+            }
+
             let _result = js_await!(self.deleteRegardlessOfRev(time_segment.id))
                 .map_err(|e| Error("while deleting a time segment", e))?;
             Ok(())

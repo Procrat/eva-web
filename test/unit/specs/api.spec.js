@@ -176,17 +176,26 @@ describe('api', () => {
       await this.$api.addTask(sampleNewTask());
       const defaultSegment = (await this.$api.listTimeSegments())[0];
       return expect(this.$api.deleteTimeSegment(defaultSegment))
-        .to.be.rejectedWith('A database error occurred while deleting a time segment: There are still tasks associated with this time segment. Please delete them or move them to another segment.')
+        .to.be.rejectedWith('A database error occurred while deleting a time segment: There is still a task in this time segment. Please delete them or move them to another segment before deleting this segment.')
         .then(async () => {
           expect(await this.$api.listTimeSegments()).to.have.lengthOf(1);
         });
     });
 
     it('should delete segments that have no tasks', async function _() {
-      const defaultSegment = (await this.$api.listTimeSegments())[0];
-      await this.$api.deleteTimeSegment(defaultSegment);
+      await this.$api.addTimeSegment(sampleNewTimeSegment());
+      await this.$api.deleteTimeSegment((await this.$api.listTimeSegments())[1]);
       const segments = await this.$api.listTimeSegments();
-      expect(segments).to.be.empty;
+      expect(segments).to.have.lengthOf(1);
+    });
+
+    it('shouldn\'t delete the last segment', async function _() {
+      const defaultSegment = (await this.$api.listTimeSegments())[0];
+      return expect(this.$api.deleteTimeSegment(defaultSegment))
+        .to.be.rejectedWith('A database error occurred while trying to delete a time segment: If you remove the last time segment, when should I schedule things?')
+        .then(async () => {
+          expect(await this.$api.listTimeSegments()).to.have.lengthOf(1);
+        });
     });
   });
 
