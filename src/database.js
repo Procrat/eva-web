@@ -19,7 +19,7 @@ export class Database {
   }
 
   async migrate() {
-    const version = await this.getVersion();
+    let version = await this.getVersion();
     if (version === 0) {
       // Set the default time segment for all tasks
       const oldTasks = (await this.pouch.allDocs({ include_docs: true })).rows.map(row => row.doc);
@@ -46,6 +46,21 @@ export class Database {
       // Change the version as the last step so that partial migrations don't
       // bump the version.
       await this.pouch.put({ _id: 'metadata', version: 1 });
+      version = 1;
+    }
+    if (version === 1) {
+      // Add a random hue to all time segments
+      const oldTimeSegments = (await this.pouch.find({ selector: { type: 'time-segment' } })).docs;
+      const newTimeSegments = oldTimeSegments.map(segment => ({
+        ...segment,
+        hue: Math.floor(Math.random() * 360),
+      }));
+      await this.pouch.bulkDocs(newTimeSegments);
+      // Change the version as the last step so that partial migrations don't
+      // bump the version.
+      const metadata = await this.pouch.get('metadata');
+      await this.pouch.put({ ...metadata, version: 2 });
+      version = 2;
     }
   }
 

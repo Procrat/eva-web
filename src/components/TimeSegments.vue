@@ -162,7 +162,14 @@ export default {
 
     addTimeSegment() {
       const nextMonday = DateTime.firstDayOfWeek(0);
-      const newSegment = new TimeSegment(undefined, '', nextMonday, [], DateTime.oneWeekInS);
+      const newSegment = new TimeSegment(
+        undefined,
+        '',
+        nextMonday,
+        [],
+        DateTime.oneWeekInS,
+        Math.floor(Math.random() * 360),
+      );
       this.timeSegments.push(newSegment);
       this.$nextTick(() => {
         this.$refs[`input-${newSegment.uniqueId}`][0].focus();

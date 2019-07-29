@@ -85,6 +85,7 @@ struct NewTimeSegment {
     start: DateTime<Utc>,
     #[serde(with = "duration_in_seconds")]
     period: Duration,
+    hue: u16,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -102,6 +103,7 @@ struct TimeSegment {
     start: DateTime<Utc>,
     #[serde(with = "duration_in_seconds")]
     period: Duration,
+    hue: u16,
 }
 
 mod id {
