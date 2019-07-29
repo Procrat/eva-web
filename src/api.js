@@ -4,15 +4,25 @@ const API = import('@backend/eva.js');
 
 
 export class TimeSegment {
-  constructor(id, name, start, ranges, period) {
+  constructor(id, name, start, ranges, period, hue) {
     this.id = id;
     this.name = name;
     this.start = start;
     this.ranges = ranges;
     this.period = period;
+    this.color = new Color({ h: hue, s: 100, l: 80 });
     this.uniqueId = `${this.name}:${this.id || new Date().getTime()}`;
-    // TODO make colors persistent
-    this.color = new Color({ h: Math.floor(Math.random() * 361), s: 100, l: 80 });
+  }
+
+  toJSON() {
+    return {
+      id: this.id,
+      name: this.name,
+      start: this.start,
+      ranges: this.ranges,
+      period: this.period,
+      hue: this.color.hue(),
+    };
   }
 }
 
@@ -40,6 +50,7 @@ function parseTimeSegment(timeSegment) {
       end: parseDate(range.end),
     })),
     timeSegment.period,
+    timeSegment.hue,
   );
 }
 

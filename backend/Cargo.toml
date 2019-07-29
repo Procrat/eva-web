@@ -24,5 +24,5 @@ web-sys = { version = "0.3", features = ["console"] }
 
 [dependencies.eva]
 git = "https://github.com/Procrat/eva"
-rev = "d5326cfd7d79d8914970568900084348b673af47"
+rev = "9490af6d4a06775c98e1732d3ae198a1a71fc725"
 default-features = false

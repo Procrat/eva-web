@@ -36,6 +36,7 @@ function sampleNewTimeSegment() {
       start: DateTime.addHours(start, 24),
       end: DateTime.addHours(start, 27),
     }],
+    hue: 0,
   };
 }
 
@@ -45,6 +46,7 @@ function timeSegmentWithoutGeneratedProperties(segment) {
   expect(segment.color).to.be.an.instanceof(Color);
   const copy = Object.assign({}, segment);
   delete copy.uniqueId;
+  copy.hue = copy.color.hue();
   delete copy.color;
   // We ensure that the returned object is read-only since we made a shallow
   // copy.
@@ -210,6 +212,7 @@ describe('api', () => {
       addedSegment.start = sampleDate();
       addedSegment.period = 8 * 42 * 60 * 60;
       addedSegment.ranges = [];
+      addedSegment.hue = 100;
       await this.$api.updateTimeSegment(addedSegment);
       const updatedSegments = await this.$api.listTimeSegments();
       expect(updatedSegments).to.have.lengthOf(2);

@@ -113,7 +113,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 [[package]]
 name = "eva"
 version = "0.0.1"
-source = "git+https://github.com/Procrat/eva?rev=d5326cfd7d79d8914970568900084348b673af47#d5326cfd7d79d8914970568900084348b673af47"
+source = "git+https://github.com/Procrat/eva?rev=9490af6d4a06775c98e1732d3ae198a1a71fc725#9490af6d4a06775c98e1732d3ae198a1a71fc725"
 dependencies = [
  "cfg-if 0.1.9 (registry+https://github.com/rust-lang/crates.io-index)",
  "chrono 0.4.6 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -131,7 +131,7 @@ dependencies = [
  "chrono 0.4.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "console_error_panic_hook 0.1.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "derive_more 0.15.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "eva 0.0.1 (git+https://github.com/Procrat/eva?rev=d5326cfd7d79d8914970568900084348b673af47)",
+ "eva 0.0.1 (git+https://github.com/Procrat/eva?rev=9490af6d4a06775c98e1732d3ae198a1a71fc725)",
  "failure 0.1.5 (registry+https://github.com/rust-lang/crates.io-index)",
  "futures-preview 0.3.0-alpha.16 (registry+https://github.com/rust-lang/crates.io-index)",
  "js-sys 0.3.24 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -749,7 +749,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 "checksum derive-new 0.5.6 (registry+https://github.com/rust-lang/crates.io-index)" = "6ca414e896ae072546f4d789f452daaecf60ddee4c9df5dc6d5936d769e3d87c"
 "checksum derive_more 0.15.0 (registry+https://github.com/rust-lang/crates.io-index)" = "7a141330240c921ec6d074a3e188a7c7ef95668bb95e7d44fa0e5778ec2a7afe"
 "checksum either 1.5.2 (registry+https://github.com/rust-lang/crates.io-index)" = "5527cfe0d098f36e3f8839852688e63c8fff1c90b2b405aef730615f9a7bcf7b"
-"checksum eva 0.0.1 (git+https://github.com/Procrat/eva?rev=d5326cfd7d79d8914970568900084348b673af47)" = "<none>"
+"checksum eva 0.0.1 (git+https://github.com/Procrat/eva?rev=9490af6d4a06775c98e1732d3ae198a1a71fc725)" = "<none>"
 "checksum failure 0.1.5 (registry+https://github.com/rust-lang/crates.io-index)" = "795bd83d3abeb9220f257e597aa0080a508b27533824adf336529648f6abf7e2"
 "checksum failure_derive 0.1.5 (registry+https://github.com/rust-lang/crates.io-index)" = "ea1063915fd7ef4309e222a5a07cf9c319fb9c7836b1f89b85458672dbb127e1"
 "checksum fuchsia-cprng 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)" = "a06f77d526c1a601b7c4cdd98f54b5eaabffc14d5f2f0296febdc7f357c6d3ba"
