@@ -49,9 +49,9 @@ export default function (reason) {
     </style>
   `);
   const app = document.getElementById('app');
-  const moreInfo = Object.keys(reason).length === 0
-    ? 'for no given reason'
-    : `because of <span class="monospaced">${JSON.stringify(reason)}</span>.`;
+  const moreInfo = Object.keys(reason).length > 0
+    ? `because of <span class="monospaced">${JSON.stringify(reason)}</span>`
+    : `because of <span class="monospaced">${reason.toString()}</span>`;
   app.innerHTML = `
     <a href="https://unsplash.com/photos/NodtnCsLdTE">
       <img src="${imgURL}" class="full-width" />
@@ -60,9 +60,7 @@ export default function (reason) {
       Unfortunately, I'm having some issues today.
       Do you think you could manage on you own for a while?
       Could you also
-        <a href="https://github.com/Procrat/eva-web/issues/new">
-          let my developer know
-        </a>
+        <a href="https://github.com/Procrat/eva-web/issues/new">let my developer know</a>
       what happened? Tell him that loading the API failed ${moreInfo}.
       He might know what's up. Thanks!
     </p>
