@@ -12,7 +12,11 @@ function resolve(dir) {
 
 module.exports = {
   context: path.resolve(__dirname, '../'),
-  entry: '@/main.js',
+  entry: [
+    // Polyfill for Edge for TextEncoder/TextDecoder, used by wasm-bindgen
+    'fast-text-encoding',
+    '@/main.js',
+  ],
 
   resolve: {
     extensions: ['.js', '.vue', '.wasm'],
