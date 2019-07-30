@@ -38,7 +38,7 @@ module.exports = {
     // Resolve imports through webpack
     'import/resolver': {
       webpack: {
-        config: 'build/webpack.common.js'
+        config: 'build/webpack.dev.js'
       }
     }
   },
