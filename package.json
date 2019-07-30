@@ -15,6 +15,7 @@
   "dependencies": {
     "color": "^3.1.2",
     "element-ui": "^2.11.1",
+    "fast-text-encoding": "^1.0.0",
     "pouchdb": "^7.1.1",
     "pouchdb-find": "^7.1.1",
     "vue": "^2.6.10",
