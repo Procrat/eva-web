@@ -29,12 +29,12 @@ export function addDays(date, days) {
   return newDate;
 }
 
-export function tomorrow() {
-  return addDays(today(), 1);
-}
-
 export function inNDays(n) {
   return addDays(today(), n);
+}
+
+export function tomorrow() {
+  return inNDays(1);
 }
 
 export function inNWeeks(n) {
@@ -67,7 +67,11 @@ export function endOfDay(datetime) {
   );
 }
 
-export function firstDayOfWeekAfter(datetime, dayOfWeek) {
+/**
+ * Returns the first date after or equal to the given point in time,
+ * corresponding to the given day of the week.
+ */
+function firstDayOfWeekAfter(datetime, dayOfWeek) {
   // Weeks should start on Monday: 0 = Monday; 6 = Sunday
   const currentWeekDay = (datetime.getDay() + 6) % 7;
   const wantedWeekDay = stripTime(datetime);
@@ -75,10 +79,18 @@ export function firstDayOfWeekAfter(datetime, dayOfWeek) {
   return wantedWeekDay;
 }
 
+/**
+ * Returns today or the day in the next 6 days corresponding to the given day of
+ * the week.
+ */
 export function firstDayOfWeek(dayOfWeek) {
   return firstDayOfWeekAfter(today(), dayOfWeek);
 }
 
+/**
+ * Returns the first point in time after or equal to the given point in time,
+ * corresponding to the given day of the week and hour.
+ */
 export function firstDayAndHourAfter(datetime, day, hour) {
   let newDatetime;
   if (day === (datetime.getDay() + 6) % 7) {
@@ -95,6 +107,8 @@ export function firstDayAndHourAfter(datetime, day, hour) {
   return newDatetime;
 }
 
+
+// === FORMATTING FUNCTIONS ===
 
 export function formatDatetime(datetime) {
   const date = stripTime(datetime);
