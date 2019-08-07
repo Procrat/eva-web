@@ -13,10 +13,7 @@ module.exports = (config) => {
     // available frameworks: https://npmjs.com/search?q=keywords:karma-adapter
     frameworks: ['mocha'],
 
-    files: [
-      '../../node_modules/@babel/polyfill/dist/polyfill.min.js',
-      './index.js',
-    ],
+    files: ['./index.js'],
 
     // available preprocessors: https://npmjs.com/search?q=keywords:karma-preprocessor
     preprocessors: {
