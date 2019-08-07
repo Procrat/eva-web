@@ -69,6 +69,14 @@ describe('datetime', () => {
     });
   });
 
+  describe('#yesterday', () => {
+    it('should return the start of yesterday', () => {
+      const t = DT.yesterday();
+      expect(today - t).to.equal(aDayInMs + dstDiff(today, t));
+      expect(t.toTimeString().substring(0, 8)).to.equal('00:00:00');
+    });
+  });
+
   describe('#inNWeeks', () => {
     it('should return a date n weeks in the future', () => {
       const t = DT.inNWeeks(42);
@@ -178,13 +186,13 @@ describe('datetime', () => {
   describe('#formatDatetime', () => {
     it("should drop the hour if it's the end of the day", () => {
       const t = DT.endOfDay(sampleDatetime());
-      expect(DT.formatDatetime(t)).to.match(/^[a-zA-Z\d/]+$/);
+      expect(DT.formatDatetime(t)).to.not.have.string(':');
     });
 
-    it("should just show the hour if it's later today", () => {
-      const now = new Date().getTime();
+    it("should just show the hour if it's today", () => {
+      const startOfToday = today.getTime();
       const endOfToday = DT.endOfDay(today).getTime();
-      const t = new Date(now + Math.floor(Math.random() * (endOfToday - now)));
+      const t = new Date(startOfToday + Math.floor(Math.random() * (endOfToday - startOfToday)));
       const format = DT.formatDatetime(t);
       expect(format).to.match(/^\d+:\d+$/);
     });
@@ -197,12 +205,24 @@ describe('datetime', () => {
       expect(DT.formatDatetime(DT.tomorrow())).to.equal('Tomorrow 0:00');
     });
 
+    it('should show "Yesterday" for yesterday', () => {
+      expect(DT.formatDatetime(DT.yesterday())).to.equal('Yesterday 0:00');
+    });
+
     it('should show the day of the week in the next 2 to 6 days', () => {
       const dDays = Math.floor(Math.random() * 5 + 2);
       const t = DT.inNDays(dDays);
       const dayOfWeekStr = t.toDateString().substring(0, 3);
       const format = DT.formatDatetime(t);
       expect(format).to.equal(`${dayOfWeekStr} 0:00`);
+    });
+
+    it('should show the day of the week for the past 2 to 6 days', () => {
+      const dDays = -Math.floor(Math.random() * 5 + 2);
+      const t = DT.inNDays(dDays);
+      const dayOfWeekStr = t.toDateString().substring(0, 3);
+      const format = DT.formatDatetime(t);
+      expect(format).to.equal(`Past ${dayOfWeekStr} 0:00`);
     });
 
     it('should show the date if its further than a week away', () => {

@@ -33,6 +33,10 @@ export function inNDays(n) {
   return addDays(today(), n);
 }
 
+export function yesterday() {
+  return inNDays(-1);
+}
+
 export function tomorrow() {
   return inNDays(1);
 }
@@ -117,8 +121,12 @@ export function formatDatetime(datetime) {
     dateStr = '';
   } else if (date.getTime() === tomorrow().getTime()) {
     dateStr = 'Tomorrow';
-  } else if (date.getTime() < inNWeeks(1).getTime()) {
+  } else if (today().getTime() < date.getTime() && date.getTime() < inNWeeks(1).getTime()) {
     dateStr = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][date.getDay()];
+  } else if (date.getTime() === yesterday().getTime()) {
+    dateStr = 'Yesterday';
+  } else if (inNWeeks(-1).getTime() < date.getTime() && date.getTime() < today().getTime()) {
+    dateStr = `Past ${['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][date.getDay()]}`;
   } else {
     dateStr = `${date.getDate()}/${date.getMonth() + 1}`;
   }
