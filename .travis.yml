@@ -39,27 +39,10 @@ script:
 
 deploy:
   - provider: script
-    script: >
-      npm install netlify-cli -g &&
-      netlify deploy
-      --site "$NETLIFY_SITE_ID"
-      --auth "$NETLIFY_ACCESS_TOKEN"
-      --message "${TRAVIS_BRANCH} @${TRAVIS_COMMIT}: $TRAVIS_COMMIT_MESSAGE"
-      --dir dist # Keep this comment here; Travis CI appends an n otherwise
+    script: ./deploy-on-netlify.sh
     skip_cleanup: true
     on:
       all_branches: true
-      condition: $TRAVIS_BRANCH != master
-
-  - provider: script
-    script: >
-      npm install netlify-cli -g &&
-      netlify deploy --prod
-      --site "$NETLIFY_SITE_ID"
-      --auth "$NETLIFY_ACCESS_TOKEN"
-      --message "${TRAVIS_BRANCH} @${TRAVIS_COMMIT}: $TRAVIS_COMMIT_MESSAGE"
-      --dir dist # Keep this comment here; Travis CI appends an n otherwise
-    skip_cleanup: true
 
   - provider: pages
     github_token: $GITHUB_TOKEN
