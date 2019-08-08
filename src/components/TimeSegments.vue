@@ -193,6 +193,9 @@ export default {
         const oldSegmentsMap = new Map(oldTimeSegments.map(segment => [segment.id, segment]));
         const promises = [];
         this.timeSegments.forEach((segment) => {
+          // Sorting of the segment ranges is delayed till here so not every new
+          // selection would cause a resort.
+          segment.ranges.sort((range1, range2) => range1.start - range2.start);
           if (oldSegmentsMap.get(segment.id) == null) {
             promises.push(this.$api.addTimeSegment(segment));
           } else {
