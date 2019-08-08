@@ -3,8 +3,10 @@ rust: nightly-2019-06-20
 cache:
   - cargo: true
   - directories:
-    - $HOME/.rustup
+    - backend/target
     - node_modules
+    - "$TRAVIS_HOME/.npm"
+    - "$TRAVIS_HOME/.nvm"
 
 
 # Install same version of wasm-bindgen-cli as of wasm-bindgen in Cargo.lock
