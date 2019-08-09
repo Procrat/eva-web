@@ -49,25 +49,22 @@ $(FRONTEND_RELEASE_OUTPUT)/eva.js $(FRONTEND_RELEASE_OUTPUT)/eva_bg.wasm: $(BACK
 # DEPENDENCIES
 
 deps: dependencies
-dependencies: rust-dependencies node-dependencies
-.PHONY: rust-dependencies node-dependencies
+dependencies: rust-dependencies js-dependencies
+.PHONY: rust-dependencies js-dependencies
 
 rust-dependencies:
 	rustup target add --toolchain $(RUST_CHANNEL) $(RUST_TARGET)
 
-node-dependencies:
+js-dependencies:
 	npm install
 
 
 # TEST
 
-test: rust-test node-test
-.PHONY: rust-test node-test
+test: js-test
+.PHONY: js-test
 
-rust-test:
-	(cd backend/ && cargo +$(RUST_CHANNEL) test)
-
-node-test: $(FRONTEND_DEBUG_OUTPUT)/eva.js $(FRONTEND_DEBUG_OUTPUT)/eva_bg.wasm
+js-test: $(FRONTEND_DEBUG_OUTPUT)/eva.js $(FRONTEND_DEBUG_OUTPUT)/eva_bg.wasm
 	npm test
 
 
