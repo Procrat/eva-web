@@ -3,9 +3,9 @@ use std::ops::Range;
 use ::serde::{Deserialize, Serialize};
 use chrono::prelude::*;
 use chrono::Duration;
-use derive_more::From;
+use derive_more::{From, Into};
 
-#[derive(Debug, Serialize, Deserialize, From)]
+#[derive(Debug, Serialize, Deserialize, From, Into)]
 pub struct NewTaskWrapper(#[serde(with = "NewTask")] pub eva::NewTask);
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -72,7 +72,7 @@ struct ScheduledTask {
     when: DateTime<Utc>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Into)]
 pub struct NewTimeSegmentWrapper(
     #[serde(with = "NewTimeSegment")] pub eva::time_segment::NewNamedTimeSegment,
 );
@@ -88,7 +88,7 @@ struct NewTimeSegment {
     hue: u16,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Into)]
 pub struct TimeSegmentWrapper(
     #[serde(with = "TimeSegment")] pub eva::time_segment::NamedTimeSegment,
 );
