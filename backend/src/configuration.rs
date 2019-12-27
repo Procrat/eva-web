@@ -10,7 +10,7 @@ static mut CONFIG_ERR: Option<Error> = None;
 pub async fn init_configuration() -> Result<()> {
     let result = try {
         configuration::Configuration {
-            database: Box::new(await!(database::database())?),
+            database: Box::new(database::database().await?),
             scheduling_strategy: configuration::SchedulingStrategy::Importance,
             time_context: Box::new(time_context()),
         }
