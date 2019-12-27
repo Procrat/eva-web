@@ -96,7 +96,7 @@ describe('datetime', () => {
       const t = DT.lastDayOfMonth();
       expect(t.getYear()).to.equal(today.getYear());
       expect(t.getMonth()).to.equal(today.getMonth());
-      const daysInCurrentMonth = new Date(today.getYear(), today.getMonth(), 0).getDate();
+      const daysInCurrentMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
       expect(t.getDate()).to.equal(daysInCurrentMonth);
       expect(t.toTimeString().substring(0, 8)).to.equal('00:00:00');
     });
