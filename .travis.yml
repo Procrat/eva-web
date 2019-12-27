@@ -33,6 +33,7 @@ install:
 
 script:
   - set -e
+  - export CHROMIUM_BIN=/usr/bin/google-chrome
   - make test
   - make release
 
