@@ -96,7 +96,7 @@ describe('api', () => {
     it('should remove a task if it exists', async function _() {
       const addedTask = await this.$api.addTask(sampleNewTask());
       const result = await this.$api.removeTask(addedTask.id);
-      expect(result).to.eql(null);
+      expect(result).to.eql(undefined);
       const allTasks = await this.$api.listTasks();
       expect(allTasks).to.eql([]);
     });
@@ -105,7 +105,7 @@ describe('api', () => {
       const addedTask = await this.$api.addTask(sampleNewTask());
       const addedTask2 = await this.$api.addTask(sampleNewTask());
       const result = await this.$api.removeTask(addedTask.id);
-      expect(result).to.eql(null);
+      expect(result).to.eql(undefined);
       const allTasks = await this.$api.listTasks();
       expect(allTasks).to.have.deep.members([addedTask2]);
     });

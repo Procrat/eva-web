@@ -1,4 +1,5 @@
 use failure::Fail;
+use wasm_bindgen::prelude::*;
 
 #[derive(Debug, Fail)]
 pub enum Error {
@@ -21,6 +22,12 @@ impl From<serde_json::Error> for Error {
 impl From<eva::Error> for Error {
     fn from(error: eva::Error) -> Self {
         Self::Eva(error)
+    }
+}
+
+impl From<Error> for JsValue {
+    fn from(error: Error) -> JsValue {
+        format!("{}", error).into()
     }
 }
 
