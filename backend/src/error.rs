@@ -13,14 +13,14 @@ pub enum Error {
 }
 
 impl From<serde_json::Error> for Error {
-    fn from(error: serde_json::Error) -> Error {
-        Error::Serialisation(error)
+    fn from(error: serde_json::Error) -> Self {
+        Self::Serialisation(error)
     }
 }
 
 impl From<eva::Error> for Error {
-    fn from(error: eva::Error) -> Error {
-        Error::Eva(error)
+    fn from(error: eva::Error) -> Self {
+        Self::Eva(error)
     }
 }
 

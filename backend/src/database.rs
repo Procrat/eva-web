@@ -4,13 +4,13 @@ use futures::future::LocalFutureObj;
 use js_sys::{Array, Promise};
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
-use wasm_bindgen_futures::futures_0_3::JsFuture;
+use wasm_bindgen_futures::JsFuture;
 
 use crate::serde;
 
 macro_rules! js_await {
     ($promise:expr) => {
-        await!(JsFuture::from($promise)).map_err(|error| parse_error(error))
+        JsFuture::from($promise).await.map_err(parse_error)
     };
 }
 

@@ -1,4 +1,3 @@
-#![feature(async_await, await_macro)]
 #![feature(try_blocks)]
 
 use futures::prelude::*;
@@ -27,7 +26,7 @@ pub fn add_task(new_task_json: JsValue) -> Promise {
         .into_serde::<serde::NewTaskWrapper>()
         .map(|x| x.0);
     let future_added_task = async {
-        Ok(await!(eva::add_task(configuration()?, new_task?))?)
+        Ok(eva::add_task(configuration()?, new_task?).await?)
     };
     promisify_future::<eva::Task, serde::TaskWrapper, _>(future_added_task)
 }
@@ -35,7 +34,7 @@ pub fn add_task(new_task_json: JsValue) -> Promise {
 #[wasm_bindgen]
 pub fn remove_task(id: u32) -> Promise {
     let future = async move {
-        Ok(await!(eva::delete_task(configuration()?, id))?)
+        Ok(eva::delete_task(configuration()?, id).await?)
     };
     promisify_future::<(), (), _>(future)
 }
@@ -43,7 +42,7 @@ pub fn remove_task(id: u32) -> Promise {
 #[wasm_bindgen]
 pub fn list_tasks() -> Promise {
     let future_tasks = async {
-        let tasks = await!(eva::tasks(configuration()?))?;
+        let tasks = eva::tasks(configuration()?).await?;
         Ok(tasks
             .into_iter()
             .map(serde::TaskWrapper)
@@ -55,7 +54,7 @@ pub fn list_tasks() -> Promise {
 #[wasm_bindgen]
 pub fn schedule() -> Promise {
     let future_schedule = async {
-        Ok(await!(eva::schedule(configuration()?, "importance"))?)
+        Ok(eva::schedule(configuration()?, "importance").await?)
     };
     promisify_future::<eva::Schedule<eva::Task>, serde::ScheduleWrapper, _>(future_schedule)
 }
@@ -66,7 +65,7 @@ pub fn add_time_segment(new_segment_json: JsValue) -> Promise {
         .into_serde::<serde::NewTimeSegmentWrapper>()
         .map(|x| x.0);
     let future = async {
-        Ok(await!(eva::add_time_segment(configuration()?, new_segment?))?)
+        Ok(eva::add_time_segment(configuration()?, new_segment?).await?)
     };
     promisify_future::<(), (), _>(future)
 }
@@ -77,7 +76,7 @@ pub fn delete_time_segment(segment_json: JsValue) -> Promise {
         .into_serde::<serde::TimeSegmentWrapper>()
         .map(|x| x.0);
     let future = async {
-        Ok(await!(eva::delete_time_segment(configuration()?, segment?))?)
+        Ok(eva::delete_time_segment(configuration()?, segment?).await?)
     };
     promisify_future::<(), (), _>(future)
 }
@@ -88,7 +87,7 @@ pub fn update_time_segment(segment_json: JsValue) -> Promise {
         .into_serde::<serde::TimeSegmentWrapper>()
         .map(|x| x.0);
     let future = async {
-        Ok(await!(eva::update_time_segment(configuration()?, segment?))?)
+        Ok(eva::update_time_segment(configuration()?, segment?).await?)
     };
     promisify_future::<(), (), _>(future)
 }
@@ -96,7 +95,7 @@ pub fn update_time_segment(segment_json: JsValue) -> Promise {
 #[wasm_bindgen]
 pub fn list_time_segments() -> Promise {
     let future_segments = async {
-        let segments = await!(eva::time_segments(configuration()?))?;
+        let segments = eva::time_segments(configuration()?).await?;
         Ok(segments
             .into_iter()
             .map(serde::TimeSegmentWrapper)
@@ -112,7 +111,7 @@ where
     With: ::serde::Serialize + From<Item>,
     F: Future<Output = Result<Item>> + 'static,
 {
-    wasm_bindgen_futures::futures_0_3::future_to_promise(
+    wasm_bindgen_futures::future_to_promise(
         future
             .and_then(|value: Item| {
                 future::ready(JsValue::from_serde(&With::from(value))).err_into::<Error>()
