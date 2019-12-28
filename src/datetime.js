@@ -1,5 +1,49 @@
-export const oneWeekInS = 7 * 24 * 60 * 60;
-export const oneWeekInMs = oneWeekInS * 1000;
+/* eslint-disable max-classes-per-file */
+
+import { TotalOrderMixin } from '@/utils';
+
+export const ONE_WEEK_IN_S = 7 * 24 * 60 * 60;
+export const ONE_WEEK_IN_MS = ONE_WEEK_IN_S * 1000;
+export const DAYS_OF_THE_WEEK = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+export class Day extends TotalOrderMixin(null) {
+  constructor(index) {
+    super();
+    this.index = index;
+    this.name = DAYS_OF_THE_WEEK[index];
+  }
+
+  nextDay() {
+    return new Day((this.index + 1) % 7);
+  }
+
+  valueOf() {
+    return this.index;
+  }
+}
+
+export class Time extends TotalOrderMixin(null) {
+  constructor(hour) {
+    super();
+    this.hour = hour;
+  }
+
+  previousHour() {
+    return new Time((this.hour - 1 + 24) % 24);
+  }
+
+  nextHour() {
+    return new Time((this.hour + 1) % 24);
+  }
+
+  valueOf() {
+    return this.hour;
+  }
+
+  toString() {
+    return `${this.hour}:00`;
+  }
+}
 
 function stripTime(datetime) {
   return new Date(

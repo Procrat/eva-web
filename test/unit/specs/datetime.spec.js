@@ -12,7 +12,7 @@ const today = DT.today();
 
 /** Returns a point in time between 1.5 weeks ago and 1.5 weeks from now */
 function sampleDatetime() {
-  const offset = (Math.random() * 3 - 1.5) * DT.oneWeekInMs;
+  const offset = (Math.random() * 3 - 1.5) * DT.ONE_WEEK_IN_MS;
   return new Date((new Date()).getTime() + offset);
 }
 

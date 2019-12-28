@@ -41,49 +41,8 @@
 <script>
 import * as DateTime from '@/datetime';
 import { TimeSegment } from '@/api';
-import { TotalOrderMixin } from '@/utils';
-import Cell from '@/components/TimeSegmentPickerCell';
+import Cell from '@/components/TimeSegmentPickerCell.vue';
 
-const DAYS_OF_THE_WEEK = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-
-export class Day extends TotalOrderMixin(null) {
-  constructor(index) {
-    super();
-    this.index = index;
-    this.name = DAYS_OF_THE_WEEK[index];
-  }
-
-  nextDay() {
-    return new Day((this.index + 1) % 7);
-  }
-
-  valueOf() {
-    return this.index;
-  }
-}
-
-export class Time extends TotalOrderMixin(null) {
-  constructor(hour) {
-    super();
-    this.hour = hour;
-  }
-
-  previousHour() {
-    return new Time((this.hour - 1 + 24) % 24);
-  }
-
-  nextHour() {
-    return new Time((this.hour + 1) % 24);
-  }
-
-  valueOf() {
-    return this.hour;
-  }
-
-  toString() {
-    return `${this.hour}:00`;
-  }
-}
 
 export class Selection {
   constructor(name, color, first, second) {
@@ -100,10 +59,10 @@ export class Selection {
 
   updateStartAndEnd() {
     const sortedDays = [this.first, this.second]
-      .map(cell => cell.day)
+      .map((cell) => cell.day)
       .sort((day1, day2) => day1.valueOf() - day2.valueOf());
     const sortedTimes = [this.first, this.second]
-      .map(cell => cell.time)
+      .map((cell) => cell.time)
       .sort((time1, time2) => time1.valueOf() - time2.valueOf());
     this.start = { day: sortedDays[0], time: sortedTimes[0] };
     this.end = { day: sortedDays[1], time: sortedTimes[1] };
@@ -122,7 +81,7 @@ export class Selection {
   }
 
   toSegmentRanges(segment) {
-    console.assert(segment.period === DateTime.oneWeekInS);
+    console.assert(segment.period === DateTime.ONE_WEEK_IN_S);
 
     function toDate(day, time) {
       return DateTime.firstDayAndHourAfter(segment.start, day.index, time.hour);
@@ -154,15 +113,18 @@ export class Selection {
   }
 
   static fromSegment(segment) {
-    console.assert(segment.period === DateTime.oneWeekInS);
+    console.assert(segment.period === DateTime.ONE_WEEK_IN_S);
     return segment.ranges.flatMap(({ start, end }) => {
       const selections = [];
 
-      let startDay = new Day((start.getDay() + 6) % 7); // Sunday-indexed -> Monday-indexed
-      const endDay = new Day((end.getDay() + 6) % 7); // Sunday-indexed -> Monday-indexed
-      let startTime = new Time(start.getHours());
-      let endTime = new Time((end.getHours() - (end.getMinutes() === 0 ? 1 : 0) + 24) % 24);
-      if (end - start === DateTime.oneWeekInMs) {
+      let startDay = new DateTime.Day((start.getDay() + 6) % 7); // Sunday-indexed -> Monday-indexed
+      const endDay = new DateTime.Day((end.getDay() + 6) % 7); // Sunday-indexed -> Monday-indexed
+      let startTime = new DateTime.Time(start.getHours());
+      let endTime = new DateTime.Time(end.getHours());
+      if (end.getMinutes() === 0) {
+        endTime = endTime.previousHour();
+      }
+      if (end - start === DateTime.ONE_WEEK_IN_MS) {
         endTime = endTime.previousHour();
       }
 
@@ -171,11 +133,11 @@ export class Selection {
           segment.name,
           segment.color,
           { day: startDay, time: startTime },
-          { day: startDay, time: new Time(23) },
+          { day: startDay, time: new DateTime.Time(23) },
         ));
 
         startDay = startDay.nextDay();
-        startTime = new Time(0);
+        startTime = new DateTime.Time(0);
       }
       selections.push(new Selection(
         segment.name,
@@ -198,8 +160,8 @@ export default {
   },
 
   constants: {
-    days: DAYS_OF_THE_WEEK.map((_, index) => new Day(index)),
-    times: Array.from({ length: 24 }, (_, i) => new Time(i)),
+    days: DateTime.DAYS_OF_THE_WEEK.map((_, index) => new DateTime.Day(index)),
+    times: Array.from({ length: 24 }, (_, i) => new DateTime.Time(i)),
   },
 
   props: {
@@ -240,7 +202,7 @@ export default {
     },
 
     cells() {
-      const cells = Array(7).fill(null).map(_ => Array(24).fill({}));
+      const cells = Array(7).fill(null).map((_) => Array(24).fill({}));
       const fillCells = (selected, segment) => {
         for (let dayIdx = segment.start.day.index; dayIdx <= segment.end.day.index; dayIdx += 1) {
           for (let { hour } = segment.start.time; hour <= segment.end.time.hour; hour += 1) {
@@ -282,7 +244,7 @@ export default {
       } else {
         this.otherSelections = [];
       }
-      if (!this.otherSegments.some(segment => segment.contains(cell.day, cell.time))) {
+      if (!this.otherSegments.some((segment) => segment.contains(cell.day, cell.time))) {
         this.selecting = true;
         this.selection = new Selection(
           this.selectedSegment.name,
@@ -299,7 +261,7 @@ export default {
       }
       const newSelection = this.selection.withSecond(cell);
       const overlapping = this.otherSegments.some(
-        segment => newSelection.overlapsWith(segment),
+        (segment) => newSelection.overlapsWith(segment),
       );
       if (!overlapping) {
         this.selection = newSelection;

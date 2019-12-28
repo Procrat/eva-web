@@ -35,9 +35,9 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
 
-import Schedule from '@/components/Schedule';
-import TaskAddForm from '@/components/TaskAddForm';
-import TimeSegments from '@/components/TimeSegments';
+import Schedule from '@/components/Schedule.vue';
+import TaskAddForm from '@/components/TaskAddForm.vue';
+import TimeSegments from '@/components/TimeSegments.vue';
 
 const bus = new Vue();
 const routes = [

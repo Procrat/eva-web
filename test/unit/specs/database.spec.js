@@ -132,12 +132,14 @@ describe('database', () => {
       expect(defaultTimeSegment).to.deep.include({
         ...origDefaultTimeSegment,
         start: origDefaultTimeSegment.start.toISOString(),
-        ranges: origDefaultTimeSegment.ranges.map(range => range.map(time => time.toISOString())),
+        ranges: origDefaultTimeSegment.ranges
+          .map((range) => range.map((time) => time.toISOString())),
       });
       expect(otherTimeSegment).to.deep.include({
         ...origOtherTimeSegment,
         start: origOtherTimeSegment.start.toISOString(),
-        ranges: origOtherTimeSegment.ranges.map(range => range.map(time => time.toISOString())),
+        ranges: origOtherTimeSegment.ranges
+          .map((range) => range.map((time) => time.toISOString())),
       });
       // 2. All time segments should now have a random hue in [0, 360]
       [defaultTimeSegment, otherTimeSegment].forEach((timeSegment) => {

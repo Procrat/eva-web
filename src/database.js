@@ -22,8 +22,10 @@ export class Database {
     let version = await this.getVersion();
     if (version === 0) {
       // Set the default time segment for all tasks
-      const oldTasks = (await this.pouch.allDocs({ include_docs: true })).rows.map(row => row.doc);
-      const newTasks = oldTasks.map(task => ({ ...task, type: 'task', time_segment_id: 0 }));
+      const oldTasks = (await this.pouch.allDocs({ include_docs: true }))
+        .rows
+        .map((row) => row.doc);
+      const newTasks = oldTasks.map((task) => ({ ...task, type: 'task', time_segment_id: 0 }));
       await this.pouch.bulkDocs(newTasks);
       // Add the default time segment itself
       const timeSegmentStart = new Date(2019, 0, 1, 9); // 9 o'clock on some day
@@ -51,7 +53,7 @@ export class Database {
     if (version === 1) {
       // Add a random hue to all time segments
       const oldTimeSegments = (await this.pouch.find({ selector: { type: 'time-segment' } })).docs;
-      const newTimeSegments = oldTimeSegments.map(segment => ({
+      const newTimeSegments = oldTimeSegments.map((segment) => ({
         ...segment,
         hue: Math.floor(Math.random() * 360),
       }));

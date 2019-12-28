@@ -69,7 +69,7 @@ Api().then((api) => {
     },
   });
 
-  const vm = new Vue({ render: h => h(App) });
+  const vm = new Vue({ render: (h) => h(App) });
 
   vm.$mount('#app');
-}).catch(reason => error500(reason));
+}).catch((reason) => error500(reason));

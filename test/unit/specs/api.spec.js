@@ -44,7 +44,7 @@ function sampleNewTimeSegment() {
 function timeSegmentWithoutGeneratedProperties(segment) {
   expect(segment.uniqueId).to.be.a('string');
   expect(segment.color).to.be.an.instanceof(Color);
-  const copy = Object.assign({}, segment);
+  const copy = { ...segment };
   delete copy.uniqueId;
   copy.hue = copy.color.hue();
   delete copy.color;

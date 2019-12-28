@@ -18,8 +18,7 @@
 <script>
 import Color from 'color';
 
-import { Day, Time } from '@/components/TimeSegmentPicker';
-
+import { Day, Time } from '@/datetime';
 
 export default {
   props: {

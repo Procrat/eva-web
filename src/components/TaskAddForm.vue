@@ -200,7 +200,7 @@ export default {
           message: 'You didn\'t select a time segment.',
         }, {
           validator: (_rule, value, callback) => {
-            if (this.timeSegments.find(segment => segment.id === this.timeSegmentId) == null) {
+            if (this.timeSegments.find((segment) => segment.id === this.timeSegmentId) == null) {
               callback(new Error('The segment you selected doesn\'t exist.'));
             } else {
               callback();

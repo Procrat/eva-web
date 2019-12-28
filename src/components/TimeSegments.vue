@@ -86,8 +86,8 @@
 import { TimeSegment } from '@/api';
 import * as DateTime from '@/datetime';
 
-import Radio from '@/components/Radio';
-import TimeSegmentPicker from '@/components/TimeSegmentPicker';
+import Radio from '@/components/Radio.vue';
+import TimeSegmentPicker from '@/components/TimeSegmentPicker.vue';
 
 
 export default {
@@ -118,7 +118,7 @@ export default {
     invalidSegment() {
       // Only accept weekly segments
       return this.timeSegments
-        .find(segment => segment.period !== DateTime.oneWeekInS);
+        .find((segment) => segment.period !== DateTime.ONE_WEEK_IN_S);
     },
 
     allSegmentsValid() {
@@ -127,7 +127,7 @@ export default {
 
     otherSegments() {
       // i.e. the ones that aren't selected
-      return this.timeSegments.filter(segment => segment !== this.selectedSegment);
+      return this.timeSegments.filter((segment) => segment !== this.selectedSegment);
     },
   },
 
@@ -167,7 +167,7 @@ export default {
         '',
         nextMonday,
         [],
-        DateTime.oneWeekInS,
+        DateTime.ONE_WEEK_IN_S,
         Math.floor(Math.random() * 360),
       );
       this.timeSegments.push(newSegment);
@@ -177,20 +177,20 @@ export default {
     },
 
     deleteTimeSegment(segment) {
-      const index = this.timeSegments.findIndex(segment_ => segment_.id === segment.id);
+      const index = this.timeSegments.findIndex((segment_) => segment_.id === segment.id);
       this.timeSegments.splice(index, 1);
     },
 
     onSelectionChanged(selections) {
       this.selectedSegment.start = DateTime.firstDayOfWeek(0);
       this.selectedSegment.ranges = selections
-        .flatMap(selection => selection.toSegmentRanges(this.selectedSegment));
+        .flatMap((selection) => selection.toSegmentRanges(this.selectedSegment));
     },
 
     async save() {
       try {
         const oldTimeSegments = await this.$api.listTimeSegments();
-        const oldSegmentsMap = new Map(oldTimeSegments.map(segment => [segment.id, segment]));
+        const oldSegmentsMap = new Map(oldTimeSegments.map((segment) => [segment.id, segment]));
         const promises = [];
         this.timeSegments.forEach((segment) => {
           // Sorting of the segment ranges is delayed till here so not every new

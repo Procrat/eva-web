@@ -45,7 +45,7 @@ function parseTimeSegment(timeSegment) {
     timeSegment.id,
     timeSegment.name,
     parseDate(timeSegment.start),
-    timeSegment.ranges.map(range => ({
+    timeSegment.ranges.map((range) => ({
       start: parseDate(range.start),
       end: parseDate(range.end),
     })),
@@ -75,7 +75,7 @@ async function jsApi(wasmApi) {
 
     async schedule() {
       const scheduledTasks = await wasmApi.schedule();
-      return scheduledTasks.map(scheduledTask => ({
+      return scheduledTasks.map((scheduledTask) => ({
         when: parseDate(scheduledTask.when),
         task: parseTask(scheduledTask.task),
       }));
@@ -95,7 +95,7 @@ async function jsApi(wasmApi) {
 
     async listTimeSegments() {
       const timeSegments = await wasmApi.list_time_segments();
-      return timeSegments.map(segment => parseTimeSegment(segment));
+      return timeSegments.map(parseTimeSegment);
     },
   };
 }

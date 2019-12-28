@@ -59,14 +59,17 @@ module.exports = {
         use: [
           { loader: 'css-loader', options: { importLoaders: 3 } },
           'postcss-loader',
-          { loader: 'sass-loader', options: { indentedSyntax: true } },
+          { loader: 'sass-loader', options: { sassOptions: { indentedSyntax: true } } },
           'webpack-multiline-sass',
         ],
       },
 
       {
         test: /\.(ttf|woff|png|jpe?g)(\?\S*)?$/,
-        use: 'file-loader',
+        use: {
+          loader: 'file-loader',
+          options: { esModule: false },
+        },
       },
     ],
   },

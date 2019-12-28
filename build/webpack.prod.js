@@ -21,13 +21,7 @@ function cleanOutput() {
 function minifyJavaScript() {
   return {
     optimization: {
-      minimizer: [
-        new TerserPlugin({
-          cache: true,
-          parallel: true,
-          sourceMap: true,
-        }),
-      ],
+      minimizer: [new TerserPlugin()],
     },
   };
 }
