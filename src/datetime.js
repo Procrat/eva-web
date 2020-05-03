@@ -6,7 +6,7 @@ export const ONE_WEEK_IN_S = 7 * 24 * 60 * 60;
 export const ONE_WEEK_IN_MS = ONE_WEEK_IN_S * 1000;
 export const DAYS_OF_THE_WEEK = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
-export class Day extends TotalOrderMixin(null) {
+export class Day extends TotalOrderMixin(class {}) {
   constructor(index) {
     super();
     this.index = index;
@@ -22,7 +22,7 @@ export class Day extends TotalOrderMixin(null) {
   }
 }
 
-export class Time extends TotalOrderMixin(null) {
+export class Time extends TotalOrderMixin(class {}) {
   constructor(hour) {
     super();
     this.hour = hour;
