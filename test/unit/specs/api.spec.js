@@ -90,7 +90,8 @@ describe('api', () => {
 
   describe('#removeTask', () => {
     it('should blow up if the task doesn\'t exist', async function _() {
-      return expect(this.$api.removeTask(123)).to.be.rejected;
+      return expect(this.$api.removeTask(123))
+        .to.be.rejectedWith('A database error occurred while deleting a task: {"status":404,"name":"not_found","message":"missing","reason":"missing"}');
     });
 
     it('should remove a task if it exists', async function _() {
@@ -108,6 +109,32 @@ describe('api', () => {
       expect(result).to.eql(undefined);
       const allTasks = await this.$api.listTasks();
       expect(allTasks).to.have.deep.members([addedTask2]);
+    });
+  });
+
+  describe('#updateTask', () => {
+    it('should blow up if the task doesn\'t exist', async function _() {
+      const task = { ...sampleNewTask(), id: 1 };
+      return expect(this.$api.updateTask(task))
+        .to.be.rejectedWith('A database error occurred while updating a task: {"status":404,"name":"not_found","message":"missing","reason":"missing"}');
+    });
+
+    it('should update a task if it exists', async function _() {
+      const task = await this.$api.addTask(sampleNewTask());
+      task.content = 'and now something completely different';
+      const result = await this.$api.updateTask(task);
+      expect(result).to.eql(undefined);
+      const allTasks = await this.$api.listTasks();
+      expect(allTasks).to.eql([task]);
+    });
+
+    it('should fail when a task is updated with a non-existent time segment', async function _() {
+      const task = await this.$api.addTask(sampleNewTask());
+      return expect(this.$api.updateTask({ ...task, time_segment_id: 1 }))
+        .to.be.rejectedWith('A database error occurred while searching for the time segment of the new task: {"status":404,"name":"not_found","message":"missing","reason":"missing"}')
+        .then(async () => {
+          expect(await this.$api.listTasks()).to.eql([task]);
+        });
     });
   });
 

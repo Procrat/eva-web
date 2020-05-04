@@ -30,6 +30,12 @@ pub async fn remove_task(id: u32) -> Result<()> {
 }
 
 #[wasm_bindgen]
+pub async fn update_task(task_json: JsValue) -> Result<()> {
+    let task = deserialise::<eva::Task, serde::TaskWrapper>(task_json)?;
+    Ok(eva::update_task(configuration()?, task).await?)
+}
+
+#[wasm_bindgen]
 pub async fn list_tasks() -> Result<JsValue> {
     let tasks = eva::tasks(configuration()?)
         .await?
