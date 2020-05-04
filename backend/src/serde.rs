@@ -19,7 +19,7 @@ struct NewTask {
     time_segment_id: u32,
 }
 
-#[derive(Debug, Serialize, Deserialize, From)]
+#[derive(Debug, Serialize, Deserialize, From, Into)]
 pub struct TaskWrapper(#[serde(with = "Task")] pub eva::Task);
 
 #[derive(Debug, Serialize, Deserialize)]

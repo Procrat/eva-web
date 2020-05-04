@@ -68,6 +68,10 @@ async function jsApi(wasmApi) {
       return wasmApi.remove_task(id);
     },
 
+    async updateTask(task) {
+      return wasmApi.update_task(task);
+    },
+
     async listTasks() {
       const tasks = await wasmApi.list_tasks();
       return tasks.map(parseTask);

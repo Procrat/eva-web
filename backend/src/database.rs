@@ -73,7 +73,7 @@ impl DatabaseT for Database {
             let serialised_task = JsValue::from_serde(&serde::NewTaskWrapper(task.clone()))
                 .map_err(|e| Error("while serialising a task", e.into()))?;
             let _result = js_await!(self.create(serialised_task, "task".into(), id))
-                .map_err(|e| Error("while saving a task", e))?;
+                .map_err(|e| Error("while creating a task", e))?;
             Ok(eva::Task {
                 id,
                 content: task.content,
@@ -99,8 +99,19 @@ impl DatabaseT for Database {
         unimplemented!()
     }
 
-    fn update_task<'a: 'b, 'b>(&'a self, _task: eva::Task) -> LocalFutureObj<'b, Result<()>> {
-        unimplemented!()
+    fn update_task<'a: 'b, 'b>(&'a self, task: eva::Task) -> LocalFutureObj<'b, Result<()>> {
+        let future = async move {
+            // Assert that the referenced time segment exist
+            let _segment = js_await!(self.get(task.time_segment_id))
+                .map_err(|e| Error("while searching for the time segment of the new task", e))?;
+            let serialised_task = JsValue::from_serde(&serde::TaskWrapper(task.clone()))
+                .map_err(|e| Error("while serialising a task", e.into()))?;
+            let _result =
+                js_await!(self.updateRegardlessOfRev(task.id, serialised_task, "task".into()))
+                    .map_err(|e| Error("while updating a task", e))?;
+            Ok(())
+        };
+        LocalFutureObj::new(Box::new(future))
     }
 
     fn all_tasks<'a: 'b, 'b>(&'a self) -> LocalFutureObj<'b, Result<Vec<eva::Task>>> {
@@ -146,7 +157,7 @@ impl DatabaseT for Database {
             .map_err(|e| Error("while serialising a time segment", e.into()));
         let future = async move {
             let _result = js_await!(self.create(serialised_segment?, "time-segment".into(), id))
-                .map_err(|e| Error("while saving a time segment", e))?;
+                .map_err(|e| Error("while creating a time segment", e))?;
             Ok(())
         };
         LocalFutureObj::new(Box::new(future))
