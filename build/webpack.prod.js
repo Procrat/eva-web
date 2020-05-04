@@ -42,7 +42,12 @@ function minifyCss() {
     ],
     optimization: {
       minimizer: [
-        new OptimizeCSSAssetsPlugin({}),
+        new OptimizeCSSAssetsPlugin({
+          cssProcessorPluginOptions: {
+            // Assumes browserslist and no dynamics CSS loading
+            preset: ['advanced'],
+          },
+        }),
       ],
     },
   };
