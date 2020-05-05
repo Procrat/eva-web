@@ -78,7 +78,6 @@ export default {
 
 <style lang="sass">
 @import '@/assets/reset.sass'
-@import '@/assets/colors.sass'
 
 img
   display: block
@@ -96,6 +95,13 @@ h2
   font-size: 18px
 h3
   font-size: 16px
+
+.el-message
+  top: 25px
+</style>
+
+<style lang="sass" scoped>
+@import '@/assets/colors.sass'
 
 .header
   margin: 20px
@@ -116,7 +122,4 @@ h3
 
 .content
   margin: 10px !important
-
-.el-message
-  top: 25px
 </style>
