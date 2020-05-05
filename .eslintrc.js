@@ -18,10 +18,10 @@ module.exports = {
     'plugin:vue/recommended',
   ],
   rules: {
-    // Allow debugger during development
+    // Allow some things during development
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
-    // Allow console statements during development
     'no-console': process.env.NODE_ENV === 'production' ? 'error' : 'off',
+    'max-len': process.env.NODE_ENV === 'production' ? 'error' : 'warn',
     // Allow Vue plugins to change the Vue constructor
     'no-param-reassign': ['error', {
       props: true,
