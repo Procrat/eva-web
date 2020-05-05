@@ -12,7 +12,10 @@
       <el-table :data="tasks">
         <el-table-column>
           <template slot-scope="{ row }">
-            {{ row.content }}
+            <schedule-editable-text
+              v-model="row.content"
+              @change="updateTask(row)"
+            />
           </template>
         </el-table-column>
 
@@ -93,7 +96,10 @@
 
         <el-table-column>
           <template slot-scope="{ row }">
-            {{ row.task.content }}
+            <schedule-editable-text
+              v-model="row.task.content"
+              @change="updateTask(row.task)"
+            />
           </template>
         </el-table-column>
 
@@ -150,8 +156,15 @@
 <script>
 import * as DateTime from '@/datetime';
 
+import ScheduleEditableText from '@/components/ScheduleEditableText.vue';
+
+
 export default {
   name: 'Schedule',
+
+  components: {
+    ScheduleEditableText,
+  },
 
   filters: {
     formatDatetime: DateTime.formatDatetime,
@@ -177,7 +190,8 @@ export default {
   created() {
     this.bus
       .$on('task-added', this.reschedule)
-      .$on('task-removed', this.reschedule);
+      .$on('task-removed', this.reschedule)
+      .$on('task-updated', this.reschedule);
 
     this.reschedule();
   },
@@ -206,6 +220,17 @@ export default {
           this.$api.listTasks()
             .then((tasks) => { this.tasks = tasks; })
             .catch((error2) => { this.$message.error(error2); });
+        });
+    },
+
+    updateTask(task) {
+      this.$api.updateTask(task)
+        .then((_) => {
+          this.$message.success('Task updated!');
+          this.bus.$emit('task-updated');
+        })
+        .catch((error) => {
+          this.$message.error(error);
         });
     },
   },

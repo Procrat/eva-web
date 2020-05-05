@@ -57,6 +57,12 @@ Vue.use(VueRouter);
 
 Vue.config.productionTip = false;
 
+Vue.directive('focus', {
+  inserted(_element, _binding, vnode) {
+    vnode.componentInstance.focus();
+  },
+});
+
 
 const body = document.getElementsByTagName('body')[0];
 body.insertAdjacentHTML('afterbegin', '<div id="app"></div>');
