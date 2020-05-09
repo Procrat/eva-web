@@ -1,8 +1,9 @@
 const path = require('path');
 
-const VueLoaderPlugin = require('vue-loader/lib/plugin');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ESLintFriendlyFormatter = require('eslint-friendly-formatter');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const VueLoaderPlugin = require('vue-loader/lib/plugin');
+const postcssNormalize = require('postcss-normalize');
 
 
 function resolve(dir) {
@@ -50,15 +51,24 @@ module.exports = {
         test: /\.css$/,
         use: [
           { loader: 'css-loader', options: { importLoaders: 1 } },
-          'postcss-loader',
+          {
+            loader: 'postcss-loader',
+            options: { ident: 'postcss', plugins: () => [postcssNormalize()] },
+          },
         ],
       },
       {
         test: /\.sass$/,
         use: [
           { loader: 'css-loader', options: { importLoaders: 3 } },
-          'postcss-loader',
-          { loader: 'sass-loader', options: { sassOptions: { indentedSyntax: true } } },
+          {
+            loader: 'postcss-loader',
+            options: { ident: 'postcss', plugins: () => [postcssNormalize()] },
+          },
+          {
+            loader: 'sass-loader',
+            options: { sassOptions: { indentedSyntax: true } },
+          },
           'webpack-multiline-sass',
         ],
       },
