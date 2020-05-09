@@ -56,7 +56,7 @@ rust-dependencies:
 	rustup target add --toolchain $(RUST_CHANNEL) $(RUST_TARGET)
 
 js-dependencies:
-	npm install
+	npm ci
 
 
 # TEST
