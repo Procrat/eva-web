@@ -1,0 +1,26 @@
+name: set-deployment-status
+
+on:
+  check_suite:
+    types: [completed]
+
+jobs:
+  set-deployment-status:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Fetch deployment URL
+      id: fetch-url
+      run: |
+        site_id='a2d01d08-c4db-4c80-9fbc-285a30d48598'
+        sha=${{ github.sha }}
+        url=$(netlify api listSiteDeploys --data '{"site_id": "${site_id}"}' | jq -r '.[] | select(.title? | contains("${sha}")?).deploy_ssl_url')
+        echo "::set-output name=url::${url}"
+  
+    - name: Set deployment status to "success"
+      uses: chrnorm/deployment-action@v1.2.0
+      with:
+        initial_status: success
+        ref: "${{ github.sha }}"
+        token: "${{ github.token }}"
+        target_url: "${{ steps.fetch-url.outputs.url }}"
+        environment: "${{ github.ref }}"
