@@ -23,6 +23,7 @@
     "regenerator-runtime": "^0.13.5",
     "vue": "^2.6.11",
     "vue-constants": "^1.0.3",
+    "vue-gtag": "^1.6.2",
     "vue-router": "^3.1.6"
   },
   "devDependencies": {

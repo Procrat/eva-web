@@ -34,16 +34,31 @@
 <script>
 import Vue from 'vue';
 import VueRouter from 'vue-router';
+import VueGtag from 'vue-gtag';
 
 import Schedule from '@/components/Schedule.vue';
 import TaskAddForm from '@/components/TaskAddForm.vue';
 import TimeSegments from '@/components/TimeSegments.vue';
 
 const bus = new Vue();
-const routes = [
-  { path: '/', component: Schedule, props: { bus } },
-  { path: '/time-segments', component: TimeSegments, props: { bus } },
-];
+const router = new VueRouter({
+  routes: [
+    {
+      name: 'home',
+      path: '/',
+      component: Schedule,
+      props: { bus },
+    },
+    {
+      name: 'time-segments',
+      path: '/time-segments',
+      component: TimeSegments,
+      props: { bus },
+    },
+  ],
+});
+
+Vue.use(VueGtag, { config: { id: 'UA-166000011-1' } }, router);
 
 export default {
   name: 'App',
@@ -56,7 +71,7 @@ export default {
     bus,
   },
 
-  router: new VueRouter({ routes }),
+  router,
 };
 </script>
 
