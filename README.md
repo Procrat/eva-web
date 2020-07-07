@@ -15,6 +15,7 @@ this useful however, so maybe you do too!
 You can freely use the version available on
 [procrat.github.io/eva-web](https://procrat.github.io/eva-web).
 
+If you enjoy it so far and want to say thanks, you can [buy me a coffee ☕](https://ko-fi.com/procrat).
 
 ## Build your own Eva web UI
 
