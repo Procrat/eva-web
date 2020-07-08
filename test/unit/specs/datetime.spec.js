@@ -116,12 +116,12 @@ describe('datetime', () => {
     });
 
     it('should return a date n months in the past', () => {
-      const t = DT.inNMonths(-42);
+      const t = DT.inNMonths(-42); // 3.5 years
       // The behaviour of what this function should do when we're at the end of
       // the month and the new month has fewer days is a bit ill-defined anyway.
       if (today.getDate() <= 28) {
         expect(t.getDate()).to.equal(today.getDate());
-        expect(t.getMonth()).to.equal(((today.getMonth() - 42) % 12) + 12);
+        expect(t.getMonth()).to.equal((today.getMonth() - 42) % 12);
         expect(t.getYear()).to.equal(today.getYear() + Math.floor((today.getMonth() - 42) / 12));
       }
       expect(t.toTimeString().substring(0, 8)).to.equal('00:00:00');
