@@ -21,6 +21,11 @@ function dstDiff(datetime1, datetime2) {
   return (datetime1.getTimezoneOffset() - datetime2.getTimezoneOffset()) * 60 * 1000;
 }
 
+/** Returns the modulus of two numbers, unlike the built-in % operator. */
+function mod(dividend, divisor) {
+  return ((dividend % divisor) + divisor) % divisor;
+}
+
 
 describe('datetime', () => {
   describe('#addHours', () => {
@@ -121,7 +126,7 @@ describe('datetime', () => {
       // the month and the new month has fewer days is a bit ill-defined anyway.
       if (today.getDate() <= 28) {
         expect(t.getDate()).to.equal(today.getDate());
-        expect(t.getMonth()).to.equal((today.getMonth() - 42) % 12);
+        expect(t.getMonth()).to.equal(mod(today.getMonth() - 42, 12));
         expect(t.getYear()).to.equal(today.getYear() + Math.floor((today.getMonth() - 42) / 12));
       }
       expect(t.toTimeString().substring(0, 8)).to.equal('00:00:00');
