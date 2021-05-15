@@ -5,6 +5,7 @@ const TerserPlugin = require('terser-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const CopyPlugin = require('copy-webpack-plugin');
 
 const commonWebpackConfig = require('./webpack.common');
 
@@ -77,6 +78,19 @@ function outputCacheableFilenames() {
 }
 
 
+function proofOwnershipForGoogleSearchConsole() {
+  return {
+    plugins: [
+      new CopyPlugin({
+        patterns: [
+          'src/assets/google18660690c202c2b5.html',
+        ],
+      }),
+    ],
+  };
+}
+
+
 const config = merge.smartStrategy({
   'module.rules': 'prepend',
   'module.rules.use': 'prepend',
@@ -101,6 +115,7 @@ const config = merge.smartStrategy({
   minifyJavaScript(),
   minifyCss(),
   outputCacheableFilenames(),
+  proofOwnershipForGoogleSearchConsole(),
 ]);
 
 
