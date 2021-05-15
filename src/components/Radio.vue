@@ -104,7 +104,7 @@ export default {
     border-color: var(--color)
     &:focus, &:hover
       border-color: var(--color)
-      box-shadow: 0 0 2px var(--color);
+      box-shadow: 0 0 2px var(--color)
 </style>
 
 <style lang="sass">
@@ -116,5 +116,5 @@ export default {
     border-color: var(--color)
     &:focus, &:hover
       border-color: var(--color)
-      box-shadow: 0 0 2px var(--color);
+      box-shadow: 0 0 2px var(--color)
 </style>

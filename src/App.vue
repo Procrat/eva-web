@@ -102,7 +102,7 @@ h3
   width: calc(100% - 40px)
   background-color: $accent-color
   border: 1px solid $accent-color
-  box-shadow: 0 2px 4px 0 rgba(0,0,0,.12), 0 0 6px 0 rgba(0,0,0,.04);
+  box-shadow: 0 2px 4px 0 rgba(0,0,0,.12), 0 0 6px 0 rgba(0,0,0,.04)
   border-radius: 6px
   img
     margin-top: -16px

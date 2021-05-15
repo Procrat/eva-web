@@ -221,7 +221,7 @@ export default {
 
 <style lang="sass" scoped>
 .segment
-  white-space: nowrap;
+  white-space: nowrap
   margin: 0px 15px
 
   .segment-radio
