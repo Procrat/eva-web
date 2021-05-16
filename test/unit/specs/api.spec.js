@@ -80,17 +80,15 @@ describe('api', () => {
 
     it('should fail when a task with non-existent time segment is added', async function _() {
       const badTask = sampleNewTask({ time_segment_id: 1 });
-      return expect(this.$api.addTask(badTask))
-        .to.be.rejectedWith('A database error occurred while searching for the time segment of the new task: {"status":404,"name":"not_found","message":"missing","reason":"missing"}')
-        .then(async () => {
-          expect(await this.$api.listTasks()).to.have.lengthOf(0);
-        });
+      await expect(this.$api.addTask(badTask))
+        .to.be.rejectedWith('A database error occurred while searching for the time segment of the new task: {"status":404,"name":"not_found","message":"missing","reason":"missing"}');
+      expect(await this.$api.listTasks()).to.have.lengthOf(0);
     });
   });
 
   describe('#removeTask', () => {
     it('should blow up if the task doesn\'t exist', async function _() {
-      return expect(this.$api.removeTask(123))
+      await expect(this.$api.removeTask(123))
         .to.be.rejectedWith('A database error occurred while deleting a task: {"status":404,"name":"not_found","message":"missing","reason":"missing"}');
     });
 
@@ -115,7 +113,7 @@ describe('api', () => {
   describe('#updateTask', () => {
     it('should blow up if the task doesn\'t exist', async function _() {
       const task = { ...sampleNewTask(), id: 1 };
-      return expect(this.$api.updateTask(task))
+      await expect(this.$api.updateTask(task))
         .to.be.rejectedWith('A database error occurred while updating a task: {"status":404,"name":"not_found","message":"missing","reason":"missing"}');
     });
 
@@ -130,11 +128,9 @@ describe('api', () => {
 
     it('should fail when a task is updated with a non-existent time segment', async function _() {
       const task = await this.$api.addTask(sampleNewTask());
-      return expect(this.$api.updateTask({ ...task, time_segment_id: 1 }))
-        .to.be.rejectedWith('A database error occurred while searching for the time segment of the new task: {"status":404,"name":"not_found","message":"missing","reason":"missing"}')
-        .then(async () => {
-          expect(await this.$api.listTasks()).to.eql([task]);
-        });
+      await expect(this.$api.updateTask({ ...task, time_segment_id: 1 }))
+        .to.be.rejectedWith('A database error occurred while searching for the time segment of the new task: {"status":404,"name":"not_found","message":"missing","reason":"missing"}');
+      expect(await this.$api.listTasks()).to.eql([task]);
     });
   });
 
@@ -204,11 +200,9 @@ describe('api', () => {
     it('shouldn\'t delete segments that have tasks', async function _() {
       await this.$api.addTask(sampleNewTask());
       const defaultSegment = (await this.$api.listTimeSegments())[0];
-      return expect(this.$api.deleteTimeSegment(defaultSegment))
-        .to.be.rejectedWith('A database error occurred while deleting a time segment: There is still a task in this time segment. Please delete them or move them to another segment before deleting this segment.')
-        .then(async () => {
-          expect(await this.$api.listTimeSegments()).to.have.lengthOf(1);
-        });
+      await expect(this.$api.deleteTimeSegment(defaultSegment))
+        .to.be.rejectedWith('A database error occurred while deleting a time segment: There is still a task in this time segment. Please delete them or move them to another segment before deleting this segment.');
+      expect(await this.$api.listTimeSegments()).to.have.lengthOf(1);
     });
 
     it('should delete segments that have no tasks', async function _() {
@@ -220,11 +214,9 @@ describe('api', () => {
 
     it('shouldn\'t delete the last segment', async function _() {
       const defaultSegment = (await this.$api.listTimeSegments())[0];
-      return expect(this.$api.deleteTimeSegment(defaultSegment))
-        .to.be.rejectedWith('A database error occurred while trying to delete a time segment: If you remove the last time segment, when should I schedule things?')
-        .then(async () => {
-          expect(await this.$api.listTimeSegments()).to.have.lengthOf(1);
-        });
+      await expect(this.$api.deleteTimeSegment(defaultSegment))
+        .to.be.rejectedWith('A database error occurred while trying to delete a time segment: If you remove the last time segment, when should I schedule things?');
+      expect(await this.$api.listTimeSegments()).to.have.lengthOf(1);
     });
   });
 

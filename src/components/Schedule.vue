@@ -200,43 +200,43 @@ export default {
   },
 
   methods: {
-    remove(id) {
-      this.$api.removeTask(id)
-        .then((_) => {
-          this.$message.success('Task removed!');
-          this.bus.$emit('task-removed');
-        })
-        .catch(this.handleError);
+    async remove(id) {
+      try {
+        await this.$api.removeTask(id);
+        this.$message.success('Task removed!');
+        this.bus.$emit('task-removed');
+      } catch (error) {
+        this.handleError(error);
+      }
     },
 
-    reschedule() {
-      this.$api.schedule()
-        .then((schedule) => {
-          this.scheduleError = '';
-          this.schedule = schedule;
-          this.loading = false;
-        })
-        .catch((error) => {
-          if (typeof error === 'string') {
-            this.scheduleError = error.toString();
-            this.$api.listTasks()
-              .then((tasks) => {
-                this.tasks = tasks;
-              })
-              .catch(this.handleError);
-          } else {
-            this.handleError(error);
+    async reschedule() {
+      try {
+        this.schedule = await this.$api.schedule();
+        this.scheduleError = '';
+        this.loading = false;
+      } catch (error) {
+        if (typeof error === 'string') {
+          this.scheduleError = error.toString();
+          try {
+            this.tasks = await this.$api.listTasks();
+          } catch (listError) {
+            this.handleError(listError);
           }
-        });
+        } else {
+          this.handleError(error);
+        }
+      }
     },
 
-    updateTask(task) {
-      this.$api.updateTask(task)
-        .then((_) => {
-          this.$message.success('Task updated!');
-          this.bus.$emit('task-updated');
-        })
-        .catch(this.handleError);
+    async updateTask(task) {
+      try {
+        await this.$api.updateTask(task);
+        this.$message.success('Task updated!');
+        this.bus.$emit('task-updated');
+      } catch (error) {
+        this.handleError(error);
+      }
     },
   },
 };
