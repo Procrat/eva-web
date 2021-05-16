@@ -156,6 +156,7 @@
 <script>
 import * as DateTime from '@/datetime';
 
+import ErrorHandling from '@/mixins/ErrorHandling';
 import ScheduleEditableText from '@/components/ScheduleEditableText.vue';
 
 
@@ -170,6 +171,8 @@ export default {
     formatDatetime: DateTime.formatDatetime,
     formatDuration: DateTime.formatDuration,
   },
+
+  mixins: [ErrorHandling],
 
   props: {
     bus: {
@@ -203,9 +206,7 @@ export default {
           this.$message.success('Task removed!');
           this.bus.$emit('task-removed');
         })
-        .catch((error) => {
-          this.$message.error(error);
-        });
+        .catch(this.handleError);
     },
 
     reschedule() {
@@ -216,10 +217,16 @@ export default {
           this.loading = false;
         })
         .catch((error) => {
-          this.scheduleError = error.toString();
-          this.$api.listTasks()
-            .then((tasks) => { this.tasks = tasks; })
-            .catch((error2) => { this.$message.error(error2); });
+          if (typeof error === 'string') {
+            this.scheduleError = error.toString();
+            this.$api.listTasks()
+              .then((tasks) => {
+                this.tasks = tasks;
+              })
+              .catch(this.handleError);
+          } else {
+            this.handleError(error);
+          }
         });
     },
 
@@ -229,9 +236,7 @@ export default {
           this.$message.success('Task updated!');
           this.bus.$emit('task-updated');
         })
-        .catch((error) => {
-          this.$message.error(error);
-        });
+        .catch(this.handleError);
     },
   },
 };

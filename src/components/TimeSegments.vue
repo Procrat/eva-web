@@ -86,6 +86,7 @@
 import { TimeSegment } from '@/api';
 import * as DateTime from '@/datetime';
 
+import ErrorHandling from '@/mixins/ErrorHandling';
 import Radio from '@/components/Radio.vue';
 import TimeSegmentPicker from '@/components/TimeSegmentPicker.vue';
 
@@ -97,6 +98,8 @@ export default {
     Radio,
     TimeSegmentPicker,
   },
+
+  mixins: [ErrorHandling],
 
   props: {
     bus: {
@@ -155,8 +158,7 @@ export default {
         this.selectedSegmentLabel = null;
         this.bus.$emit('time-segments-changed');
       } catch (error) {
-        console.error(error);
-        this.$message.error(error.toString());
+        this.handleError(error);
       }
     },
 
@@ -209,8 +211,7 @@ export default {
         await Promise.all(promises);
         this.$message.success('Saved!');
       } catch (error) {
-        console.error(error);
-        this.$message.error(error.toString());
+        this.handleError(error);
       }
       await this.refetch();
     },
