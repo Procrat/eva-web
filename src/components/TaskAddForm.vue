@@ -95,8 +95,12 @@
 <script>
 import * as DateTime from '@/datetime';
 
+import ErrorHandling from '@/mixins/ErrorHandling';
+
 export default {
   name: 'TaskAddForm',
+
+  mixins: [ErrorHandling],
 
   props: {
     bus: {
@@ -248,7 +252,7 @@ export default {
         this.resetFields();
         this.bus.$emit('task-added');
       } catch (error) {
-        this.$message.error(error);
+        this.handleError(error);
       }
     },
 
@@ -257,8 +261,7 @@ export default {
         this.timeSegments = await this.$api.listTimeSegments();
         await this.setFallbackTimeSegment();
       } catch (error) {
-        console.error(error);
-        this.$message.error(error.toString());
+        this.handleError(error);
       }
     },
 

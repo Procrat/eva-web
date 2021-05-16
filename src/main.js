@@ -11,6 +11,7 @@ import {
   Form,
   FormItem,
   Input,
+  Link,
   Loading,
   Message,
   Option,
@@ -39,6 +40,7 @@ Vue.use(DatePicker);
 Vue.use(Form);
 Vue.use(FormItem);
 Vue.use(Input);
+Vue.use(Link);
 Vue.use(Option);
 Vue.use(Radio);
 Vue.use(Row);
