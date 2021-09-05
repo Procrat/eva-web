@@ -9,7 +9,8 @@ name = "eva"
 crate-type = ["cdylib"]
 
 [dependencies]
-chrono = { version = "0.4", features = ["serde"] }
+async-trait = "0.1"
+chrono = { version = "0.4", default-features = false, features = ["oldtime", "serde"] }
 console_error_panic_hook = "0.1"
 derive_more = { version = "0.99", default-features = false, features = ["from", "into"] }
 failure = "0.1"
@@ -24,5 +25,5 @@ web-sys = { version = "0.3", features = ["console"] }
 
 [dependencies.eva]
 git = "https://github.com/Procrat/eva"
-rev = "131b28d5fb918e2f041a7033c31d02736a3f2ca9"
+rev = "0d947fa500592b01f23cb4165c37ce900f8c3e67"
 default-features = false
