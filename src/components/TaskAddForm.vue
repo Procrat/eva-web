@@ -91,7 +91,6 @@
   </el-card>
 </template>
 
-
 <script>
 import * as DateTime from '@/datetime';
 
@@ -303,7 +302,6 @@ export default {
   },
 };
 </script>
-
 
 <style lang="sass" scoped>
 .add-task-form

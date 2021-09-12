@@ -4,7 +4,6 @@ import PouchDB from 'pouchdb';
 import { Database } from '@/database';
 import * as DateTime from '@/datetime';
 
-
 describe('database', () => {
   beforeEach(async function _() {
     this.$innerDB = new PouchDB('tasks');

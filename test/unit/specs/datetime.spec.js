@@ -2,13 +2,11 @@ import { expect } from 'chai';
 
 import * as DT from '@/datetime';
 
-
 const aMinuteInMs = 60 * 1000;
 const anHourInMs = 60 * aMinuteInMs;
 const aDayInMs = 24 * anHourInMs;
 const aWeekInMs = 7 * aDayInMs;
 const today = DT.today();
-
 
 /** Returns a point in time between 1.5 weeks ago and 1.5 weeks from now */
 function sampleDatetime() {
@@ -25,7 +23,6 @@ function dstDiff(datetime1, datetime2) {
 function mod(dividend, divisor) {
   return ((dividend % divisor) + divisor) % divisor;
 }
-
 
 describe('datetime', () => {
   describe('#addHours', () => {

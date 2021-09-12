@@ -4,8 +4,7 @@
 
 import imgURL from '@/assets/500.jpeg';
 
-
-export default function (reason) {
+export default function error500(reason) {
   const head = document.getElementsByTagName('head')[0];
   head.insertAdjacentHTML('beforeend', `
     <style>

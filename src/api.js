@@ -2,7 +2,6 @@ import Color from 'color';
 
 const API = import('@backend/eva.js');
 
-
 export class TimeSegment {
   constructor(id, name, start, ranges, period, hue) {
     this.id = id;
@@ -26,11 +25,9 @@ export class TimeSegment {
   }
 }
 
-
 function parseDate(timestamp) {
   return new Date(Date.parse(timestamp));
 }
-
 
 function parseTask(task) {
   return {
@@ -38,7 +35,6 @@ function parseTask(task) {
     deadline: parseDate(task.deadline),
   };
 }
-
 
 function parseTimeSegment(timeSegment) {
   return new TimeSegment(
@@ -53,7 +49,6 @@ function parseTimeSegment(timeSegment) {
     timeSegment.hue,
   );
 }
-
 
 async function jsApi(wasmApi) {
   await wasmApi.initialize();
@@ -104,8 +99,7 @@ async function jsApi(wasmApi) {
   };
 }
 
-
-export default async function () {
+export default async function api() {
   try {
     return jsApi(await API);
   } catch (error) {

@@ -81,7 +81,6 @@
   </el-card>
 </template>
 
-
 <script>
 import { TimeSegment } from '@/api';
 import * as DateTime from '@/datetime';
@@ -89,7 +88,6 @@ import * as DateTime from '@/datetime';
 import ErrorHandling from '@/mixins/ErrorHandling';
 import Radio from '@/components/Radio.vue';
 import TimeSegmentPicker from '@/components/TimeSegmentPicker.vue';
-
 
 export default {
   name: 'TimeSegments',
@@ -218,7 +216,6 @@ export default {
   },
 };
 </script>
-
 
 <style lang="sass" scoped>
 .segment

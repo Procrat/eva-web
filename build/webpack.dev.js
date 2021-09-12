@@ -1,43 +1,52 @@
 const path = require('path');
 
-const webpack = require('webpack');
 const merge = require('webpack-merge');
 const FilterWarningsPlugin = require('webpack-filter-warnings-plugin');
 
 const commonWebpackConfig = require('./webpack.common');
 
 
-module.exports = merge(commonWebpackConfig, {
-  mode: 'development',
+const config = merge.smartStrategy({
+  'module.rules.use': 'prepend',
+})(
+  commonWebpackConfig,
+  {
+    mode: 'development',
 
-  resolve: {
-    alias: {
-      '@backend': path.join(__dirname, '..', 'generated-wasm', 'debug'),
-    },
-  },
-
-  module: {
-    rules: [
-      {
-        test: /\.(css|sass)$/,
-        use: 'vue-style-loader',
-        enforce: 'post',
+    resolve: {
+      alias: {
+        '@backend': path.join(__dirname, '..', 'generated-wasm', 'debug'),
       },
+    },
+
+    module: {
+      rules: [
+        {
+          test: /\.sass$/,
+          use: 'style-loader',
+        },
+        {
+          test: /\.css$/,
+          use: 'style-loader',
+        },
+      ],
+    },
+
+    plugins: [
+      new FilterWarningsPlugin({
+        exclude: /Critical dependency: the request of a dependency is an expression/,
+      }),
     ],
-  },
 
-  plugins: [
-    new webpack.HotModuleReplacementPlugin(),
-    new FilterWarningsPlugin({
-      exclude: /Critical dependency: the request of a dependency is an expression/,
-    }),
-  ],
+    devServer: {
+      hot: true,
+      client: {
+        logging: 'warn',
+      },
+    },
 
-  devServer: {
-    clientLogLevel: 'warning',
-    hot: true,
-    overlay: true,
-  },
+    devtool: 'cheap-module-eval-source-map',
+  }
+);
 
-  devtool: 'cheap-module-eval-source-map',
-});
+module.exports = config;

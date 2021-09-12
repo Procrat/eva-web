@@ -3,7 +3,6 @@ const path = require('path');
 const ESLintFriendlyFormatter = require('eslint-friendly-formatter');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const VueLoaderPlugin = require('vue-loader/lib/plugin');
-const postcssNormalize = require('postcss-normalize');
 
 
 function resolve(dir) {
@@ -46,25 +45,18 @@ module.exports = {
         enforce: 'pre',
         include: [resolve('src'), resolve('test')],
       },
-
       {
         test: /\.css$/,
         use: [
           { loader: 'css-loader', options: { importLoaders: 1 } },
-          {
-            loader: 'postcss-loader',
-            options: { ident: 'postcss', plugins: () => [postcssNormalize()] },
-          },
+          'postcss-loader',
         ],
       },
       {
         test: /\.sass$/,
         use: [
           { loader: 'css-loader', options: { importLoaders: 3 } },
-          {
-            loader: 'postcss-loader',
-            options: { ident: 'postcss', plugins: () => [postcssNormalize()] },
-          },
+          'postcss-loader',
           {
             loader: 'sass-loader',
             options: { sassOptions: { indentedSyntax: true } },
@@ -72,7 +64,6 @@ module.exports = {
           'webpack-multiline-sass',
         ],
       },
-
       {
         test: /\.(ttf|woff|png|jpe?g)(\?\S*)?$/,
         use: {

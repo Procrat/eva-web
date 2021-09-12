@@ -31,10 +31,16 @@ function minifyJavaScript() {
 function minifyCss() {
   return {
     module: {
-      rules: [{
-        test: /\.(css|sass)$/,
-        use: MiniCssExtractPlugin.loader,
-      }],
+      rules: [
+        {
+          test: /\.css$/,
+          use: MiniCssExtractPlugin.loader,
+        },
+        {
+          test: /\.sass$/,
+          use: MiniCssExtractPlugin.loader,
+        },
+      ],
     },
     plugins: [
       new MiniCssExtractPlugin({
@@ -92,9 +98,8 @@ function proofOwnershipForGoogleSearchConsole() {
 
 
 const config = merge.smartStrategy({
-  'module.rules': 'prepend',
   'module.rules.use': 'prepend',
-})([
+})(
   commonWebpackConfig,
   {
     mode: 'production',
@@ -116,7 +121,7 @@ const config = merge.smartStrategy({
   minifyCss(),
   outputCacheableFilenames(),
   proofOwnershipForGoogleSearchConsole(),
-]);
+);
 
 
 module.exports = config;

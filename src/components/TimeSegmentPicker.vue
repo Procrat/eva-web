@@ -37,12 +37,10 @@
   </table>
 </template>
 
-
 <script>
 import * as DateTime from '@/datetime';
 import { TimeSegment } from '@/api';
 import Cell from '@/components/TimeSegmentPickerCell.vue';
-
 
 export class Selection {
   constructor(name, color, first, second) {
@@ -278,7 +276,6 @@ export default {
   },
 };
 </script>
-
 
 <style lang="sass" scoped>
 table

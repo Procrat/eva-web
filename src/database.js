@@ -5,7 +5,6 @@ import * as DateTime from '@/datetime';
 
 PouchDB.plugin(PouchDBFind);
 
-
 export class Database {
   constructor(pouch) {
     this.pouch = pouch;
@@ -190,6 +189,5 @@ export class Database {
     return response.docs;
   }
 }
-
 
 export default Database;

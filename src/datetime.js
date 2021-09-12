@@ -155,7 +155,6 @@ export function firstDayAndHourAfter(datetime, day, hour) {
   return newDatetime;
 }
 
-
 // === FORMATTING FUNCTIONS ===
 
 export function formatDatetime(datetime) {

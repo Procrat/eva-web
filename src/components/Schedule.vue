@@ -152,13 +152,11 @@
   </el-card>
 </template>
 
-
 <script>
 import * as DateTime from '@/datetime';
 
 import ErrorHandling from '@/mixins/ErrorHandling';
 import ScheduleEditableText from '@/components/ScheduleEditableText.vue';
-
 
 export default {
   name: 'Schedule',
@@ -241,7 +239,6 @@ export default {
   },
 };
 </script>
-
 
 <style lang="sass" scoped>
 .alert.el-alert

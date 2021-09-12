@@ -30,7 +30,6 @@
   </div>
 </template>
 
-
 <script>
 import Vue from 'vue';
 import VueRouter from 'vue-router';
@@ -75,14 +74,9 @@ export default {
 };
 </script>
 
-<style lang="css">
-/* Keep this in a CSS block; sass-loader's @import conflicts with
-   postcss-normalize's
- */
-@import "normalize/opinionated";
-</style>
-
 <style lang="sass">
+@import "@csstools/normalize.css/opinionated"
+
 body
   font-family: "Helvetica Neue", Helvetica,
     "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑",

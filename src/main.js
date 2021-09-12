@@ -65,7 +65,6 @@ Vue.directive('focus', {
   },
 });
 
-
 const body = document.getElementsByTagName('body')[0];
 body.insertAdjacentHTML('afterbegin', '<div id="app"></div>');
 

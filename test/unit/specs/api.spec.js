@@ -5,14 +5,12 @@ import PouchDB from 'pouchdb';
 import api from '@/api';
 import * as DateTime from '@/datetime';
 
-
 function sampleDate() {
   const date = new Date();
   // We don't store milliseconds, so let's round it so we can compare with it.
   date.setMilliseconds(0);
   return date;
 }
-
 
 function sampleNewTask(overrides) {
   return {
@@ -24,7 +22,6 @@ function sampleNewTask(overrides) {
     ...overrides,
   };
 }
-
 
 function sampleNewTimeSegment() {
   const start = new Date();
@@ -40,7 +37,6 @@ function sampleNewTimeSegment() {
   };
 }
 
-
 function timeSegmentWithoutGeneratedProperties(segment) {
   expect(segment.uniqueId).to.be.a('string');
   expect(segment.color).to.be.an.instanceof(Color);
@@ -52,7 +48,6 @@ function timeSegmentWithoutGeneratedProperties(segment) {
   // copy.
   return Object.freeze(copy);
 }
-
 
 describe('api', () => {
   beforeEach(async function setAPI() {
