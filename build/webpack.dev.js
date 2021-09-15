@@ -1,10 +1,8 @@
 const path = require('path');
 
 const merge = require('webpack-merge');
-const FilterWarningsPlugin = require('webpack-filter-warnings-plugin');
 
 const commonWebpackConfig = require('./webpack.common');
-
 
 const config = merge.smartStrategy({
   'module.rules.use': 'prepend',
@@ -32,12 +30,6 @@ const config = merge.smartStrategy({
       ],
     },
 
-    plugins: [
-      new FilterWarningsPlugin({
-        exclude: /Critical dependency: the request of a dependency is an expression/,
-      }),
-    ],
-
     devServer: {
       hot: true,
       client: {
@@ -45,8 +37,8 @@ const config = merge.smartStrategy({
       },
     },
 
-    devtool: 'cheap-module-eval-source-map',
-  }
+    devtool: 'eval',
+  },
 );
 
 module.exports = config;

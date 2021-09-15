@@ -1,6 +1,6 @@
 import Color from 'color';
 
-const API = import('@backend/eva.js');
+import * as backend from '@backend/eva.js';
 
 export class TimeSegment {
   constructor(id, name, start, ranges, period, hue) {
@@ -50,30 +50,30 @@ function parseTimeSegment(timeSegment) {
   );
 }
 
-async function jsApi(wasmApi) {
-  await wasmApi.initialize();
+async function jsBackend() {
+  await backend.initialize();
 
   return {
     async addTask(task) {
-      const addedTask = await wasmApi.add_task(task);
+      const addedTask = await backend.add_task(task);
       return parseTask(addedTask);
     },
 
     async removeTask(id) {
-      return wasmApi.remove_task(id);
+      return backend.remove_task(id);
     },
 
     async updateTask(task) {
-      return wasmApi.update_task(task);
+      return backend.update_task(task);
     },
 
     async listTasks() {
-      const tasks = await wasmApi.list_tasks();
+      const tasks = await backend.list_tasks();
       return tasks.map(parseTask);
     },
 
     async schedule() {
-      const scheduledTasks = await wasmApi.schedule();
+      const scheduledTasks = await backend.schedule();
       return scheduledTasks.map((scheduledTask) => ({
         when: parseDate(scheduledTask.when),
         task: parseTask(scheduledTask.task),
@@ -81,19 +81,19 @@ async function jsApi(wasmApi) {
     },
 
     async addTimeSegment(segment) {
-      return wasmApi.add_time_segment(segment);
+      return backend.add_time_segment(segment);
     },
 
     async deleteTimeSegment(segment) {
-      return wasmApi.delete_time_segment(segment);
+      return backend.delete_time_segment(segment);
     },
 
     async updateTimeSegment(segment) {
-      return wasmApi.update_time_segment(segment);
+      return backend.update_time_segment(segment);
     },
 
     async listTimeSegments() {
-      const timeSegments = await wasmApi.list_time_segments();
+      const timeSegments = await backend.list_time_segments();
       return timeSegments.map(parseTimeSegment);
     },
   };
@@ -101,7 +101,7 @@ async function jsApi(wasmApi) {
 
 export default async function api() {
   try {
-    return jsApi(await API);
+    return jsBackend();
   } catch (error) {
     console.error(error);
     throw error;

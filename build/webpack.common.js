@@ -4,11 +4,9 @@ const ESLintFriendlyFormatter = require('eslint-friendly-formatter');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const VueLoaderPlugin = require('vue-loader/lib/plugin');
 
-
 function resolve(dir) {
   return path.join(__dirname, '..', dir);
 }
-
 
 module.exports = {
   context: path.resolve(__dirname, '../'),
@@ -61,15 +59,11 @@ module.exports = {
             loader: 'sass-loader',
             options: { sassOptions: { indentedSyntax: true } },
           },
-          'webpack-multiline-sass',
         ],
       },
       {
         test: /\.(ttf|woff|png|jpe?g)(\?\S*)?$/,
-        use: {
-          loader: 'file-loader',
-          options: { esModule: false },
-        },
+        type: 'asset',
       },
     ],
   },
@@ -78,4 +72,8 @@ module.exports = {
     new VueLoaderPlugin(),
     new HtmlWebpackPlugin({ title: 'Eva' }),
   ],
+
+  experiments: {
+    asyncWebAssembly: true,
+  },
 };

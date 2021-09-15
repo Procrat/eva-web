@@ -11,7 +11,7 @@ const webpackConfig = require('../../build/webpack.test');
 module.exports = (config) => {
   config.set({
     // available frameworks: https://npmjs.com/search?q=keywords:karma-adapter
-    frameworks: ['mocha'],
+    frameworks: ['mocha', 'webpack'],
 
     files: ['./index.js'],
 

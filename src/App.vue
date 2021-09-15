@@ -74,13 +74,12 @@ export default {
 };
 </script>
 
+<!-- eslint-disable max-len -->
 <style lang="sass">
 @import "@csstools/normalize.css/opinionated"
 
 body
-  font-family: "Helvetica Neue", Helvetica,
-    "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑",
-    Arial, sans-serif
+  font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif
   font-size: 14px
 
 h1

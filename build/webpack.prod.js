@@ -1,32 +1,11 @@
 const path = require('path');
 
 const merge = require('webpack-merge');
-const TerserPlugin = require('terser-webpack-plugin');
-const { CleanWebpackPlugin } = require('clean-webpack-plugin');
-const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
 
 const commonWebpackConfig = require('./webpack.common');
-
-
-function cleanOutput() {
-  return {
-    plugins: [
-      new CleanWebpackPlugin(),
-    ],
-  };
-}
-
-
-function minifyJavaScript() {
-  return {
-    optimization: {
-      minimizer: [new TerserPlugin()],
-    },
-  };
-}
-
 
 function minifyCss() {
   return {
@@ -49,9 +28,10 @@ function minifyCss() {
     ],
     optimization: {
       minimizer: [
-        new OptimizeCSSAssetsPlugin({
-          cssProcessorPluginOptions: {
-            // Assumes browserslist and no dynamics CSS loading
+        '...',
+        new CssMinimizerPlugin({
+          minimizerOptions: {
+            // Assumes browserslist and no dynamic CSS loading
             preset: ['advanced'],
           },
         }),
@@ -60,29 +40,15 @@ function minifyCss() {
   };
 }
 
-
 function outputCacheableFilenames() {
   return {
     output: {
-      filename: '[name].[chunkhash].js',
-      chunkFilename: '[name].[chunkhash].js',
-    },
-    module: {
-      rules: [
-        {
-          test: /\.(ttf|woff|png|jpe?g)(\?\S*)?$/,
-          use: {
-            loader: 'file-loader',
-            options: {
-              name: 'assets/[name].[hash].[ext]',
-            },
-          },
-        },
-      ],
+      filename: '[name].[contenthash].js',
+      chunkFilename: '[name].[contenthash].js',
+      assetModuleFilename: 'assets/[name].[contenthash][ext][query]',
     },
   };
 }
-
 
 function proofOwnershipForGoogleSearchConsole() {
   return {
@@ -96,7 +62,6 @@ function proofOwnershipForGoogleSearchConsole() {
   };
 }
 
-
 const config = merge.smartStrategy({
   'module.rules.use': 'prepend',
 })(
@@ -108,20 +73,17 @@ const config = merge.smartStrategy({
         '@backend': path.join(__dirname, '..', 'generated-wasm', 'release'),
       },
     },
+    output: {
+      clean: true,
+    },
     devtool: 'source-map',
     performance: {
       maxAssetSize: 350000,
     },
-    stats: {
-      children: false,
-    },
   },
-  cleanOutput(),
-  minifyJavaScript(),
   minifyCss(),
   outputCacheableFilenames(),
   proofOwnershipForGoogleSearchConsole(),
 );
-
 
 module.exports = config;
