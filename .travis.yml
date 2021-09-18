@@ -26,7 +26,7 @@ INSTALL_WASM_BINDGEN_CLI: &INSTALL_WASM_BINDGEN_CLI
     fi
 
 install:
-  - nvm install v10.13
+  - nvm install v14.17.6
   - *INSTALL_WASM_BINDGEN_CLI
   - make dependencies
 
