@@ -7,10 +7,12 @@ cache:
     - node_modules
     - "$TRAVIS_HOME/.npm"
     - "$TRAVIS_HOME/.nvm"
+addons:
+  chrome: stable
 
 
 # Install same version of wasm-bindgen-cli as of wasm-bindgen in Cargo.lock
-INSTALL_WASM_BINDGEN_CLI: &INSTALL_WASM_BINDGEN_CLI
+_INSTALL_WASM_BINDGEN_CLI: &INSTALL_WASM_BINDGEN_CLI
   |
     wanted_version=$(sed -n '/^name = "wasm-bindgen"$/{N;s/.*\nversion = "\(.*\)"$/\1/p}' backend/Cargo.lock)
     if ! which wasm-bindgen &>/dev/null; then
@@ -41,11 +43,11 @@ script:
 deploy:
   - provider: script
     script: ./deploy-on-netlify.sh
-    skip_cleanup: true
     on:
       all_branches: true
+    edge: true
 
   - provider: pages
-    github_token: $GITHUB_TOKEN
+    token: $GITHUB_TOKEN
     local_dir: dist
-    skip_cleanup: true
+    edge: true
