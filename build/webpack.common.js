@@ -1,5 +1,6 @@
 const path = require('path');
 
+const ESLintPlugin = require('eslint-webpack-plugin');
 const ESLintFriendlyFormatter = require('eslint-friendly-formatter');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const VueLoaderPlugin = require('vue-loader/lib/plugin');
@@ -35,15 +36,6 @@ module.exports = {
         include: [resolve('src'), resolve('test')],
       },
       {
-        test: /\.(js|vue)$/,
-        use: {
-          loader: 'eslint-loader',
-          options: { formatter: ESLintFriendlyFormatter },
-        },
-        enforce: 'pre',
-        include: [resolve('src'), resolve('test')],
-      },
-      {
         test: /\.css$/,
         use: [
           { loader: 'css-loader', options: { importLoaders: 1 } },
@@ -70,6 +62,11 @@ module.exports = {
 
   plugins: [
     new VueLoaderPlugin(),
+    new ESLintPlugin({
+      extensions: ['js', 'vue'],
+      exclude: ['generated-wasm', 'node_modules'],
+      formatter: ESLintFriendlyFormatter,
+    }),
     new HtmlWebpackPlugin({ title: 'Eva' }),
   ],
 
