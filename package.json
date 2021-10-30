@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "color": "^4.0.1",
-    "core-js": "^3.18.3",
+    "core-js": "^3.19.0",
     "element-ui": "^2.15.6",
     "fast-text-encoding": "^1.0.3",
     "pouchdb": "^7.2.2",
