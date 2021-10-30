@@ -24,7 +24,7 @@
     "vue": "^2.6.14",
     "vue-constants": "^1.0.3",
     "vue-gtag": "^1.16.1",
-    "vue-router": "^3.5.2"
+    "vue-router": "^3.5.3"
   },
   "devDependencies": {
     "@babel/core": "^7.16.0",
@@ -33,7 +33,7 @@
     "@soda/friendly-errors-webpack-plugin": "^1.8.0",
     "autoprefixer": "^10.3.7",
     "babel-eslint": "^10.1.0",
-    "babel-loader": "^8.2.2",
+    "babel-loader": "^8.2.3",
     "babel-plugin-component": "^1.1.1",
     "babel-plugin-istanbul": "^6.1.1",
     "chai": "^4.3.4",
