@@ -66,10 +66,7 @@
       </el-table>
     </template>
 
-    <template
-      v-else
-      class="schedule"
-    >
+    <template v-else>
       <el-table
         v-loading="loading"
         :data="schedule"
@@ -159,6 +156,7 @@ import ErrorHandling from '@/mixins/ErrorHandling';
 import ScheduleEditableText from '@/components/ScheduleEditableText.vue';
 
 export default {
+  // eslint-disable-next-line vue/multi-word-component-names
   name: 'Schedule',
 
   components: {
@@ -243,11 +241,4 @@ export default {
 <style lang="sass" scoped>
 .alert.el-alert
   margin-bottom: 20px
-
-.schedule
-  .el-table
-    .cell
-      padding: 6px 18px
-    .el-table__empty-block
-      min-height: 225px
 </style>

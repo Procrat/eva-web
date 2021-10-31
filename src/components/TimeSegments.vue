@@ -8,7 +8,7 @@
             :key="segment.uniqueId"
             class="segment"
           >
-            <radio
+            <ColoredRadio
               v-model="selectedSegment"
               :value="segment"
               :label="segment.uniqueId"
@@ -23,7 +23,7 @@
                 class="segment-name"
                 @focus="$refs[`input-${segment.uniqueId}`][0].$parent.select()"
               />
-            </radio>
+            </ColoredRadio>
             <el-button
               circle
               plain
@@ -86,14 +86,14 @@ import { TimeSegment } from '@/api';
 import * as DateTime from '@/datetime';
 
 import ErrorHandling from '@/mixins/ErrorHandling';
-import Radio from '@/components/Radio.vue';
+import ColoredRadio from '@/components/ColoredRadio.vue';
 import TimeSegmentPicker from '@/components/TimeSegmentPicker.vue';
 
 export default {
   name: 'TimeSegments',
 
   components: {
-    Radio,
+    ColoredRadio,
     TimeSegmentPicker,
   },
 

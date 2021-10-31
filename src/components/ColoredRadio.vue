@@ -50,7 +50,7 @@
 import Color from 'color';
 
 export default {
-  name: 'Radio',
+  name: 'ColoredRadio',
 
   model: {
     prop: 'selectedValue',
