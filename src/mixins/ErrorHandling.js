@@ -8,12 +8,14 @@ export default {
         // Got an unexpected error. Print it to the console and show a generic
         // error message to the user.
         console.error(error);
-        const messageElement = this.$createElement('p',
+        const messageElement = this.$createElement(
+          'p',
           { class: 'el-message__content' },
           [
             `Oh dear, something didn't exactly work like I intended it to.
             Could you `,
-            this.$createElement('el-link',
+            this.$createElement(
+              'el-link',
               {
                 props: {
                   type: 'primary',
@@ -24,9 +26,11 @@ export default {
                   target: '_blank',
                 },
               },
-              'let my developer know'),
+              'let my developer know',
+            ),
             ' that something went wrong? Tell him that you got this error:',
-            this.$createElement('p',
+            this.$createElement(
+              'p',
               {
                 attrs: {
                   style: 'padding-left: 20px',
@@ -34,9 +38,11 @@ export default {
               },
               [
                 this.$createElement('code', error.toString()),
-              ]),
+              ],
+            ),
             "He might know what's up. Thanks!",
-          ]);
+          ],
+        );
         this.$message({
           message: messageElement,
           type: 'error',

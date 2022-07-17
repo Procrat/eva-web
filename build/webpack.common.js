@@ -3,7 +3,7 @@ const path = require('path');
 const ESLintPlugin = require('eslint-webpack-plugin');
 const ESLintFriendlyFormatter = require('eslint-friendly-formatter');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const VueLoaderPlugin = require('vue-loader/lib/plugin');
+const { VueLoaderPlugin } = require('vue-loader');
 
 function resolve(dir) {
   return path.join(__dirname, '..', dir);

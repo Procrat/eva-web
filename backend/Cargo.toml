@@ -9,14 +9,15 @@ name = "eva"
 crate-type = ["cdylib"]
 
 [dependencies]
+anyhow = "1.0"
 async-trait = "0.1"
 chrono = { version = "0.4", default-features = false, features = ["oldtime", "serde"] }
 console_error_panic_hook = "0.1"
 derive_more = { version = "0.99", default-features = false, features = ["from", "into"] }
 failure = "0.1"
-futures = "0.3"
+getrandom = { version = "0.2", features = ["js"] }
 js-sys = "0.3"
-rand = { version = "0.7", features = ["wasm-bindgen"] }
+rand = "0.8"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 wasm-bindgen = { version = "0.2", features = ["serde-serialize"] }
@@ -25,5 +26,5 @@ web-sys = { version = "0.3", features = ["console"] }
 
 [dependencies.eva]
 git = "https://github.com/Procrat/eva"
-rev = "0d947fa500592b01f23cb4165c37ce900f8c3e67"
+rev = "e1340e5024d47df79231eb9781daab066735f0f7"
 default-features = false

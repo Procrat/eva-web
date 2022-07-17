@@ -1,5 +1,5 @@
 use js_sys::JSON;
-use wasm_bindgen::prelude::*;
+use wasm_bindgen::JsValue;
 
 #[allow(dead_code)]
 pub fn log(obj: &JsValue) {

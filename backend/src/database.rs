@@ -1,3 +1,4 @@
+use anyhow::{anyhow, Context};
 use async_trait::async_trait;
 use eva::database::{Database as DatabaseT, Error, Result as EvaDbResult};
 use eva::time_segment::{NamedTimeSegment as TimeSegment, NewNamedTimeSegment as NewTimeSegment};
@@ -7,12 +8,13 @@ use wasm_bindgen::JsCast;
 
 use crate::serde;
 
-pub async fn database() -> crate::Result<impl DatabaseT> {
-    let result = Database::open()
+pub async fn database() -> anyhow::Result<impl DatabaseT> {
+    let js_value = Database::open()
         .await
         .map_err(parse_error)
-        .map_err(|e| crate::Error::Database("while opening the database", e))?;
-    Ok(Database::from(result))
+        .map_err(|error| anyhow!(error))
+        .context("An unexpected error happened while opening the database")?;
+    Ok(Database::from(js_value))
 }
 
 #[wasm_bindgen(raw_module = "../../src/database")]
@@ -84,7 +86,12 @@ impl DatabaseT for Database {
             .get(task.time_segment_id)
             .await
             .map_err(parse_error)
-            .map_err(|e| Error("while searching for the time segment of the new task", e))?;
+            .map_err(|e| {
+                Error(
+                    "while searching for the time segment of the new task",
+                    e.into(),
+                )
+            })?;
         let id = rand::random();
         let serialised_task = JsValue::from_serde(&serde::NewTaskWrapper(task.clone()))
             .map_err(|e| Error("while serialising a task", e.into()))?;
@@ -92,7 +99,7 @@ impl DatabaseT for Database {
             .create(serialised_task, "task".into(), id)
             .await
             .map_err(parse_error)
-            .map_err(|e| Error("while creating a task", e))?;
+            .map_err(|e| Error("while creating a task", e.into()))?;
         Ok(eva::Task {
             id,
             content: task.content,
@@ -108,7 +115,7 @@ impl DatabaseT for Database {
             .deleteRegardlessOfRev(id)
             .await
             .map_err(parse_error)
-            .map_err(|e| Error("while deleting a task", e))?;
+            .map_err(|e| Error("while deleting a task", e.into()))?;
         Ok(())
     }
 
@@ -122,14 +129,19 @@ impl DatabaseT for Database {
             .get(task.time_segment_id)
             .await
             .map_err(parse_error)
-            .map_err(|e| Error("while searching for the time segment of the new task", e))?;
+            .map_err(|e| {
+                Error(
+                    "while searching for the time segment of the new task",
+                    e.into(),
+                )
+            })?;
         let serialised_task = JsValue::from_serde(&serde::TaskWrapper(task.clone()))
             .map_err(|e| Error("while serialising a task", e.into()))?;
         let _result = self
             .updateRegardlessOfRev(task.id, serialised_task, "task".into())
             .await
             .map_err(parse_error)
-            .map_err(|e| Error("while updating a task", e))?;
+            .map_err(|e| Error("while updating a task", e.into()))?;
         Ok(())
     }
 
@@ -138,7 +150,7 @@ impl DatabaseT for Database {
             .allTasks()
             .await
             .map_err(parse_error)
-            .map_err(|e| Error("while loading all tasks", e))?;
+            .map_err(|e| Error("while loading all tasks", e.into()))?;
         Ok(documents
             .into_serde::<Vec<serde::TaskWrapper>>()
             .map_err(|e| Error("while deserialising tasks", e.into()))?
@@ -152,7 +164,7 @@ impl DatabaseT for Database {
             .allTasksPerTimeSegment()
             .await
             .map_err(parse_error)
-            .map_err(|e| Error("while loading all tasks", e))?;
+            .map_err(|e| Error("while loading all tasks", e.into()))?;
         let deserialised_documents: Vec<(serde::TimeSegmentWrapper, Vec<serde::TaskWrapper>)> =
             documents
                 .into_serde()
@@ -171,7 +183,7 @@ impl DatabaseT for Database {
             .create(serialised_segment?, "time-segment".into(), id)
             .await
             .map_err(parse_error)
-            .map_err(|e| Error("while creating a time segment", e))?;
+            .map_err(|e| Error("while creating a time segment", e.into()))?;
         Ok(())
     }
 
@@ -181,12 +193,12 @@ impl DatabaseT for Database {
             .tasksForTimeSegment(time_segment.id)
             .await
             .map_err(parse_error)
-            .map_err(|e| Error("while fetching tasks for a time segment", e))?
+            .map_err(|e| Error("while fetching tasks for a time segment", e.into()))?
             .into();
         if tasks.length() > 0 {
             Err(Error(
                 "while deleting a time segment",
-                failure::format_err!(
+                format!(
                     "There {} in this time segment. Please delete them or move them to \
                         another segment before deleting this segment.",
                     if tasks.length() == 1 {
@@ -194,7 +206,8 @@ impl DatabaseT for Database {
                     } else {
                         format!("are still {} tasks", tasks.length())
                     },
-                ),
+                )
+                .into(),
             ))?;
         }
 
@@ -203,14 +216,12 @@ impl DatabaseT for Database {
             .allTimeSegments()
             .await
             .map_err(parse_error)
-            .map_err(|e| Error("while deleting a time segments", e))?
+            .map_err(|e| Error("while deleting a time segments", e.into()))?
             .into();
         if time_segments.length() <= 1 {
             Err(Error(
                 "while trying to delete a time segment",
-                failure::format_err!(
-                    "If you remove the last time segment, when should I schedule things?"
-                ),
+                "If you remove the last time segment, when should I schedule things?".into(),
             ))?
         }
 
@@ -218,7 +229,7 @@ impl DatabaseT for Database {
             .deleteRegardlessOfRev(time_segment.id)
             .await
             .map_err(parse_error)
-            .map_err(|e| Error("while deleting a time segment", e))?;
+            .map_err(|e| Error("while deleting a time segment", e.into()))?;
         Ok(())
     }
 
@@ -230,7 +241,7 @@ impl DatabaseT for Database {
             .updateRegardlessOfRev(id, serialised_segment?, "time-segment".into())
             .await
             .map_err(parse_error)
-            .map_err(|e| Error("while updating a time segment", e))?;
+            .map_err(|e| Error("while updating a time segment", e.into()))?;
         Ok(())
     }
 
@@ -239,7 +250,7 @@ impl DatabaseT for Database {
             .allTimeSegments()
             .await
             .map_err(parse_error)
-            .map_err(|e| Error("while loading time segments", e))?;
+            .map_err(|e| Error("while loading time segments", e.into()))?;
         Ok(documents
             .into_serde::<Vec<serde::TimeSegmentWrapper>>()
             .map_err(|e| Error("while deserialising time segments", e.into()))?
@@ -249,10 +260,10 @@ impl DatabaseT for Database {
     }
 }
 
-fn parse_error(error: JsValue) -> failure::Error {
-    let error_string: String = error
-        .dyn_into::<js_sys::Object>()
-        .map(|object| object.to_string().into())
-        .unwrap_or("Error was not an object".into());
-    failure::err_msg(error_string)
+fn parse_error(error: JsValue) -> Box<dyn std::error::Error + Send + Sync> {
+    let error_string: String = match error.dyn_into::<js_sys::Object>() {
+        Ok(object) => String::from(object.to_string()),
+        Err(_) => "Error was not an object".to_string(),
+    };
+    Box::from(error_string)
 }

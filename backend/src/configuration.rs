@@ -1,44 +1,42 @@
+use std::borrow::Cow;
+
+use anyhow::{Error, Result};
 use chrono::prelude::*;
 use eva::configuration;
 
 use crate::database;
-use crate::error::{Error, Result};
 
-static mut CONFIG: Option<configuration::Configuration> = None;
-static mut CONFIG_ERR: Option<Error> = None;
+static mut CONFIG: std::result::Result<configuration::Configuration, Cow<'static, str>> = Err(
+    Cow::Borrowed("An unexpected error happened: The configuration isn't initialised yet"),
+);
 
 pub async fn init_configuration() -> Result<()> {
-    let result = try {
-        configuration::Configuration {
-            database: Box::new(database::database().await?),
-            scheduling_strategy: configuration::SchedulingStrategy::Importance,
-            time_context: Box::new(time_context()),
+    match new_configuration().await {
+        Ok(config_) => {
+            unsafe { CONFIG = Ok(config_) };
+            Ok(())
         }
-    };
-    unsafe {
-        match result {
-            Ok(config_) => {
-                CONFIG = Some(config_);
-                Ok(())
-            }
-            Err(error) => {
-                CONFIG_ERR = Some(Error::Configuration(Error::to_string(&error)));
-                Err(error)
-            }
+        Err(error) => {
+            unsafe { CONFIG = Err(Cow::from(error.to_string())) };
+            Err(error)
         }
     }
 }
 
 pub fn configuration() -> Result<&'static configuration::Configuration> {
-    unsafe {
-        match (&CONFIG, &CONFIG_ERR) {
-            (Some(config_), _) => Ok(&config_),
-            (_, Some(config_err_)) => Err(Error::Configuration(config_err_.to_string())),
-            (_, _) => Err(Error::Configuration(
-                "Internal error: configuration not initialized.".into(),
-            )),
-        }
+    match unsafe { &CONFIG } {
+        Ok(config) => Ok(config),
+        Err(error) => Err(Error::msg(error)),
     }
+}
+
+async fn new_configuration() -> Result<configuration::Configuration> {
+    let database = database::database().await?;
+    Ok(configuration::Configuration {
+        database: Box::new(database),
+        scheduling_strategy: configuration::SchedulingStrategy::Importance,
+        time_context: Box::new(time_context()),
+    })
 }
 
 struct JsTimeContext;

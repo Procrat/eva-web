@@ -1,20 +1,21 @@
 #![feature(try_blocks)]
 
+use anyhow::Context;
 use wasm_bindgen::prelude::*;
 
 use configuration::configuration;
-use error::{Error, Result};
+use error::Result;
 
 mod configuration;
-pub(crate) mod console;
-pub(crate) mod database;
-pub(crate) mod error;
-pub(crate) mod serde;
+mod console;
+mod database;
+mod error;
+mod serde;
 
 #[wasm_bindgen]
 pub async fn initialize() -> Result<()> {
     console_error_panic_hook::set_once();
-    configuration::init_configuration().await
+    Ok(configuration::init_configuration().await?)
 }
 
 #[wasm_bindgen]
@@ -90,12 +91,16 @@ fn deserialise<Item, With>(item: JsValue) -> Result<Item>
 where
     With: for<'a> ::serde::Deserialize<'a> + Into<Item>,
 {
-    Ok(item.into_serde::<With>()?.into())
+    Ok(item
+        .into_serde::<With>()
+        .context("I unexpectedly couldn't transform some data you entered")?
+        .into())
 }
 
 fn serialise<Item, With>(item: Item) -> Result<JsValue>
 where
     With: ::serde::Serialize + From<Item>,
 {
-    JsValue::from_serde(&With::from(item)).map_err(|e| e.into())
+    Ok(JsValue::from_serde(&With::from(item))
+        .context("I unexpectedly couldn't transform some data you requested")?)
 }
