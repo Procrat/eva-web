@@ -37,7 +37,7 @@ const config = merge.smartStrategy({
       },
     },
 
-    devtool: 'eval',
+    devtool: 'eval-cheap-source-map',
   },
 );
 

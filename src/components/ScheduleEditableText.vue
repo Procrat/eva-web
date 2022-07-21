@@ -2,12 +2,12 @@
   <el-input
     v-if="focused"
     v-focus
-    :value="value"
+    :model-value="modelValue"
     class="editable-content"
     type="textarea"
     placeholder="What do you want to do?"
     autosize
-    @input="$emit('input', $event)"
+    @input="$emit('update:modelValue', $event)"
     @change="$emit('change', $event)"
     @blur="focused = false"
   />
@@ -17,7 +17,7 @@
     tabindex="0"
     @click="focused = true"
     @focus="focused = true"
-  >{{ value }}</pre>
+  >{{ modelValue }}</pre>
 </template>
 
 <script>
@@ -25,11 +25,13 @@ export default {
   name: 'ScheduleEditableText',
 
   props: {
-    value: {
+    modelValue: {
       type: String,
       required: true,
     },
   },
+
+  emits: ['update:modelValue', 'change'],
 
   data() {
     return {

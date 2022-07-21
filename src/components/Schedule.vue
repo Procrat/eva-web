@@ -1,3 +1,10 @@
+<script setup>
+import { Delete as DeleteIcon } from '@element-plus/icons-vue';
+
+import * as DateTime from '@/datetime';
+import ScheduleEditableText from '@/components/ScheduleEditableText.vue';
+</script>
+
 <template>
   <el-card>
     <template v-if="scheduleError">
@@ -11,7 +18,7 @@
 
       <el-table :data="tasks">
         <el-table-column>
-          <template slot-scope="{ row }">
+          <template #default="{ row }">
             <schedule-editable-text
               v-model="row.content"
               @change="updateTask(row)"
@@ -24,8 +31,8 @@
           align="center"
           width="140px"
         >
-          <template slot-scope="{ row }">
-            {{ row.deadline | formatDatetime }}
+          <template #default="{ row }">
+            {{ DateTime.formatDatetime(row.deadline) }}
           </template>
         </el-table-column>
 
@@ -34,8 +41,8 @@
           align="center"
           width="100px"
         >
-          <template slot-scope="{ row }">
-            {{ row.duration | formatDuration }}
+          <template #default="{ row }">
+            {{ DateTime.formatDuration(row.duration) }}
           </template>
         </el-table-column>
 
@@ -44,7 +51,7 @@
           align="center"
           width="120px"
         >
-          <template slot-scope="{ row }">
+          <template #default="{ row }">
             {{ row.importance }}
           </template>
         </el-table-column>
@@ -53,11 +60,11 @@
           align="center"
           width="66px"
         >
-          <template slot-scope="{ row }">
+          <template #default="{ row }">
             <el-button
               plain
-              size="mini"
-              icon="el-icon-delete"
+              size="small"
+              :icon="DeleteIcon"
               type="danger"
               @click="remove(row.id)"
             />
@@ -72,27 +79,27 @@
         :data="schedule"
         element-loading-text="Thinking really hard about your schedule..."
       >
-        <div slot="empty">
+        <template #empty>
           Add your first task and world domination will soon be yours!¹
           <br><br>
           <span style="font-size: 10px">
             ¹ There is no proven correlation between using Eva and
             achieving world domination.
           </span>
-        </div>
+        </template>
 
         <el-table-column
           label="Schedule"
           align="center"
           width="140px"
         >
-          <template slot-scope="{ row }">
-            {{ row.when | formatDatetime }}
+          <template #default="{ row }">
+            {{ DateTime.formatDatetime(row.when) }}
           </template>
         </el-table-column>
 
         <el-table-column>
-          <template slot-scope="{ row }">
+          <template #default="{ row }">
             <schedule-editable-text
               v-model="row.task.content"
               @change="updateTask(row.task)"
@@ -105,8 +112,8 @@
           align="center"
           width="140px"
         >
-          <template slot-scope="{ row }">
-            {{ row.task.deadline | formatDatetime }}
+          <template #default="{ row }">
+            {{ DateTime.formatDatetime(row.task.deadline) }}
           </template>
         </el-table-column>
 
@@ -115,8 +122,8 @@
           align="center"
           width="100px"
         >
-          <template slot-scope="{ row }">
-            {{ row.task.duration | formatDuration }}
+          <template #default="{ row }">
+            {{ DateTime.formatDuration(row.task.duration) }}
           </template>
         </el-table-column>
 
@@ -125,7 +132,7 @@
           align="center"
           width="120px"
         >
-          <template slot-scope="{ row }">
+          <template #default="{ row }">
             {{ row.task.importance }}
           </template>
         </el-table-column>
@@ -134,12 +141,12 @@
           align="center"
           width="66px"
         >
-          <template slot-scope="{ row }">
+          <template #default="{ row }">
             <el-button
               plain
               type="danger"
-              icon="el-icon-delete"
-              size="mini"
+              :icon="DeleteIcon"
+              size="small"
               @click="remove(row.task.id)"
             />
           </template>
@@ -150,32 +157,15 @@
 </template>
 
 <script>
-import * as DateTime from '@/datetime';
+import bus from '@/bus';
 
 import ErrorHandling from '@/mixins/ErrorHandling';
-import ScheduleEditableText from '@/components/ScheduleEditableText.vue';
 
 export default {
   // eslint-disable-next-line vue/multi-word-component-names
   name: 'Schedule',
 
-  components: {
-    ScheduleEditableText,
-  },
-
-  filters: {
-    formatDatetime: DateTime.formatDatetime,
-    formatDuration: DateTime.formatDuration,
-  },
-
   mixins: [ErrorHandling],
-
-  props: {
-    bus: {
-      type: Object,
-      required: true,
-    },
-  },
 
   data() {
     return {
@@ -187,10 +177,9 @@ export default {
   },
 
   created() {
-    this.bus
-      .$on('task-added', this.reschedule)
-      .$on('task-removed', this.reschedule)
-      .$on('task-updated', this.reschedule);
+    bus.$on('task-added', this.reschedule);
+    bus.$on('task-removed', this.reschedule);
+    bus.$on('task-updated', this.reschedule);
 
     this.reschedule();
   },
@@ -200,7 +189,7 @@ export default {
       try {
         await this.$api.removeTask(id);
         this.$message.success('Task removed!');
-        this.bus.$emit('task-removed');
+        bus.$emit('task-removed');
       } catch (error) {
         this.handleError(error);
       }
@@ -229,7 +218,7 @@ export default {
       try {
         await this.$api.updateTask(task);
         this.$message.success('Task updated!');
-        this.bus.$emit('task-updated');
+        bus.$emit('task-updated');
       } catch (error) {
         this.handleError(error);
       }

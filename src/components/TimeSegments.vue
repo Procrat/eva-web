@@ -1,18 +1,25 @@
+<script setup>
+import { Delete as DeleteIcon, Plus as PlusIcon, Check as CheckIcon } from '@element-plus/icons-vue';
+
+import ColoredRadio from '@/components/ColoredRadio.vue';
+import TimeSegmentPicker from '@/components/TimeSegmentPicker.vue';
+</script>
+
 <template>
   <el-card>
     <h1>Time segments</h1>
     <div v-if="allSegmentsValid">
       <el-row>
-        <template v-for="segment in timeSegments">
-          <span
-            :key="segment.uniqueId"
-            class="segment"
-          >
+        <template
+          v-for="segment in timeSegments"
+          :key="segment.uniqueId"
+        >
+          <span class="segment">
             <ColoredRadio
               v-model="selectedSegment"
+              v-model:selected-label="selectedSegmentLabel"
               :value="segment"
               :label="segment.uniqueId"
-              :selected-label.sync="selectedSegmentLabel"
               group-name="segment"
               :color="segment.color.darken(0.3)"
               class="segment-radio"
@@ -27,8 +34,8 @@
             <el-button
               circle
               plain
-              size="mini"
-              icon="el-icon-delete"
+              size="small"
+              :icon="DeleteIcon"
               type="danger"
               @click="deleteTimeSegment(segment)"
             />
@@ -39,11 +46,10 @@
         </template>
       </el-row>
       <el-row
-        type="flex"
         justify="center"
       >
         <el-button
-          icon="el-icon-plus"
+          :icon="PlusIcon"
           class="add-segment-btn"
           @click="addTimeSegment"
         >
@@ -52,7 +58,7 @@
         <el-button
           v-if="changed"
           type="primary"
-          icon="el-icon-check"
+          :icon="CheckIcon"
           @click="save"
         >
           Save
@@ -83,28 +89,15 @@
 
 <script>
 import { TimeSegment } from '@/api';
+import bus from '@/bus';
 import * as DateTime from '@/datetime';
 
 import ErrorHandling from '@/mixins/ErrorHandling';
-import ColoredRadio from '@/components/ColoredRadio.vue';
-import TimeSegmentPicker from '@/components/TimeSegmentPicker.vue';
 
 export default {
   name: 'TimeSegments',
 
-  components: {
-    ColoredRadio,
-    TimeSegmentPicker,
-  },
-
   mixins: [ErrorHandling],
-
-  props: {
-    bus: {
-      type: Object,
-      required: true,
-    },
-  },
 
   data() {
     return {
@@ -154,7 +147,7 @@ export default {
         this.timeSegments = await this.$api.listTimeSegments();
         this.selectedSegment = null;
         this.selectedSegmentLabel = null;
-        this.bus.$emit('time-segments-changed');
+        bus.$emit('time-segments-changed');
       } catch (error) {
         this.handleError(error);
       }

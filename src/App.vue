@@ -1,6 +1,13 @@
+<script setup>
+import { Setting as SettingIcon } from '@element-plus/icons-vue';
+
+import bus from '@/bus';
+import TaskAddForm from '@/components/TaskAddForm.vue';
+</script>
+
 <template>
-  <div id="app">
-    <el-row class="header">
+  <el-container class="page">
+    <el-header>
       <router-link to="/">
         <img src="@/assets/logo.png">
       </router-link>
@@ -8,69 +15,27 @@
         to="/time-segments"
         class="time-segments-link"
       >
-        ⚙
+        <el-icon>
+          <setting-icon />
+        </el-icon>
       </router-link>
-    </el-row>
+    </el-header>
 
-    <el-row
-      :gutter="20"
-      class="content"
-    >
-      <el-col
-        id="sidebar"
-        :span="5"
-      >
+    <el-container direction="horizontal">
+      <el-aside>
         <TaskAddForm :bus="bus" />
-      </el-col>
+      </el-aside>
 
-      <el-col :span="19">
+      <el-main>
         <router-view />
-      </el-col>
-    </el-row>
-  </div>
+      </el-main>
+    </el-container>
+  </el-container>
 </template>
 
 <script>
-import Vue from 'vue';
-import VueRouter from 'vue-router';
-import VueGtag from 'vue-gtag';
-
-import Schedule from '@/components/Schedule.vue';
-import TaskAddForm from '@/components/TaskAddForm.vue';
-import TimeSegments from '@/components/TimeSegments.vue';
-
-const bus = new Vue();
-const router = new VueRouter({
-  routes: [
-    {
-      name: 'home',
-      path: '/',
-      component: Schedule,
-      props: { bus },
-    },
-    {
-      name: 'time-segments',
-      path: '/time-segments',
-      component: TimeSegments,
-      props: { bus },
-    },
-  ],
-});
-
-Vue.use(VueGtag, { config: { id: 'UA-166000011-1' } }, router);
-
 export default {
   name: 'App',
-
-  components: {
-    TaskAddForm,
-  },
-
-  constants: {
-    bus,
-  },
-
-  router,
 };
 </script>
 
@@ -100,23 +65,35 @@ table
 <style lang="sass" scoped>
 @import '@/assets/colors.sass'
 
-.header
+.page
   margin: 20px
-  width: calc(100% - 40px)
+
+.el-container
+  gap: 20px
+
+.el-header
+  --el-header-padding: 8px
+  display: flex
+  justify-content: space-between
   background-color: $accent-color
   border: 1px solid $accent-color
   box-shadow: 0 2px 4px 0 rgba(0,0,0,.12), 0 0 6px 0 rgba(0,0,0,.04)
   border-radius: 6px
   img
-    margin-top: -16px
-    float: left
+    margin-top: -24px
+    margin-left: -8px
   a.time-segments-link
-    margin: 7px 7px 0 0
-    float: right
-    font-size: 40px
     color: white
-    text-decoration: none
+    font-size: 40px
 
-.content
-  margin: 10px !important
+.el-aside
+  --el-aside-width: 250px
+  // Allow shadow of el-card to show through
+  padding: 12px
+  margin: -12px
+
+.el-main
+  // Allow shadow of el-card to show through
+  --el-main-padding: 12px
+  margin: -12px
 </style>

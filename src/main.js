@@ -1,65 +1,74 @@
-import Vue from 'vue';
+import * as Vue from 'vue';
 import VueConstants from 'vue-constants';
-import VueRouter from 'vue-router';
+import VueGtag from 'vue-gtag';
 
 import {
-  Alert,
-  Button,
-  Card,
-  Col,
-  DatePicker,
-  Form,
-  FormItem,
-  Input,
-  Link,
-  Loading,
-  Message,
-  Option,
-  Radio,
-  Row,
-  Select,
-  Slider,
-  Table,
-  TableColumn,
-  TimeSelect,
-} from 'element-ui';
-import locale from 'element-ui/lib/locale';
-import english from 'element-ui/lib/locale/lang/en';
+  ElAlert,
+  ElAside,
+  ElButton,
+  ElCard,
+  ElCol,
+  ElContainer,
+  ElDatePicker,
+  ElForm,
+  ElFormItem,
+  ElHeader,
+  ElIcon,
+  ElInput,
+  ElLink,
+  ElLoading,
+  ElMain,
+  ElMessage,
+  ElOption,
+  ElRadio,
+  ElRow,
+  ElSelect,
+  ElSlider,
+  ElTable,
+  ElTableColumn,
+  ElTimeSelect,
+} from 'element-plus';
+import 'element-plus/theme-chalk/index.css';
 
-import App from '@/App.vue';
 import Api from '@/api';
+import App from '@/App.vue';
 import error500 from '@/error-500';
+import router from '@/router';
 
-locale.use(english);
+const app = Vue.createApp(App);
 
-Vue.use(Alert);
-Vue.use(Button);
-Vue.use(Card);
-Vue.use(Col);
-Vue.use(DatePicker);
-Vue.use(Form);
-Vue.use(FormItem);
-Vue.use(Input);
-Vue.use(Link);
-Vue.use(Option);
-Vue.use(Radio);
-Vue.use(Row);
-Vue.use(Select);
-Vue.use(Slider);
-Vue.use(Table);
-Vue.use(TableColumn);
-Vue.use(TimeSelect);
-Vue.use(Loading.directive);
-Vue.prototype.$loading = Loading.service;
-Vue.prototype.$message = Message;
+app.use(ElAlert);
+app.use(ElAside);
+app.use(ElButton);
+app.use(ElCard);
+app.use(ElCol);
+app.use(ElContainer);
+app.use(ElDatePicker);
+app.use(ElForm);
+app.use(ElFormItem);
+app.use(ElHeader);
+app.use(ElIcon);
+app.use(ElInput);
+app.use(ElLink);
+app.use(ElLoading);
+app.use(ElMain);
+app.use(ElMessage);
+app.use(ElOption);
+app.use(ElRadio);
+app.use(ElRow);
+app.use(ElSelect);
+app.use(ElSlider);
+app.use(ElTable);
+app.use(ElTableColumn);
+app.use(ElTimeSelect);
 
-Vue.use(VueConstants);
+app.use(VueConstants);
 
-Vue.use(VueRouter);
+app.use(router);
 
-Vue.config.productionTip = false;
+app.use(VueGtag, { config: { id: 'UA-166000011-1' } }, router);
 
-Vue.directive('focus', {
+app.directive('focus', {
   inserted(_element, _binding, vnode) {
     vnode.componentInstance.focus();
   },
@@ -69,13 +78,12 @@ const body = document.getElementsByTagName('body')[0];
 body.insertAdjacentHTML('afterbegin', '<div id="app"></div>');
 
 Api().then((api) => {
-  Vue.use({
+  app.use({
     install(vue, _options) {
-      vue.prototype.$api = api;
+      // eslint-disable-next-line no-param-reassign
+      vue.config.globalProperties.$api = api;
     },
   });
 
-  const vm = new Vue({ render: (h) => h(App) });
-
-  vm.$mount('#app');
+  app.mount('#app');
 }).catch((reason) => error500(reason));

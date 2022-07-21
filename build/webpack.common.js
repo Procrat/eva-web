@@ -4,6 +4,7 @@ const ESLintPlugin = require('eslint-webpack-plugin');
 const ESLintFriendlyFormatter = require('eslint-friendly-formatter');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { VueLoaderPlugin } = require('vue-loader');
+const { DefinePlugin } = require('webpack');
 
 function resolve(dir) {
   return path.join(__dirname, '..', dir);
@@ -61,6 +62,10 @@ module.exports = {
   },
 
   plugins: [
+    new DefinePlugin({
+      __VUE_OPTIONS_API__: true,
+      __VUE_PROD_DEVTOOLS__: false,
+    }),
     new VueLoaderPlugin(),
     new ESLintPlugin({
       extensions: ['js', 'vue'],

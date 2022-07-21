@@ -1,3 +1,7 @@
+<script setup>
+import { Calendar as CalendarIcon } from '@element-plus/icons-vue';
+</script>
+
 <template>
   <el-card>
     <el-form
@@ -6,7 +10,7 @@
       :rules="formRules"
       class="add-task-form"
       :show-message="false"
-      @submit.native.prevent="addTask"
+      @submit.prevent="addTask"
     >
       <el-form-item prop="content">
         <el-input
@@ -21,10 +25,11 @@
           type="datetime"
           :clearable="false"
           placeholder="Deadline"
-          format="MMM d  H:mm"
-          :picker-options="deadlinePickerOptions"
-          default-time="23:59:00"
-          prefix-icon="el-icon-date"
+          format="ddd D MMM  H:mm"
+          :default-time="new Date(2000, 1, 1, 23, 59, 0)"
+          :disabled-date="(date) => date <= new Date()"
+          :shortcuts="deadlinePickerShortcuts"
+          :prefix-icon="CalendarIcon"
           class="deadline"
         />
       </el-form-item>
@@ -77,7 +82,6 @@
       </el-form-item>
 
       <el-row
-        type="flex"
         justify="center"
       >
         <el-button
@@ -92,6 +96,7 @@
 </template>
 
 <script>
+import bus from '@/bus';
 import * as DateTime from '@/datetime';
 
 import ErrorHandling from '@/mixins/ErrorHandling';
@@ -100,13 +105,6 @@ export default {
   name: 'TaskAddForm',
 
   mixins: [ErrorHandling],
-
-  props: {
-    bus: {
-      type: Object,
-      required: true,
-    },
-  },
 
   constants: {
     durationOptions: [
@@ -119,48 +117,28 @@ export default {
       { minutes: 120, stringified: '2 hours' },
     ],
 
-    deadlinePickerOptions: {
-      firstDayOfWeek: 1,
-      disabledDate(date) {
-        return date <= new Date();
-      },
-      shortcuts: [{
-        text: 'Today',
-        onClick(picker) {
-          picker.$emit('pick', DateTime.endOfDay(DateTime.today()));
-        },
-      }, {
-        text: 'Tomorrow',
-        onClick(picker) {
-          picker.$emit('pick', DateTime.endOfDay(DateTime.tomorrow()));
-        },
-      }, {
-        text: 'This week',
-        onClick(picker) {
-          picker.$emit('pick', DateTime.endOfDay(DateTime.firstDayOfWeek(6)));
-        },
-      }, {
-        text: '+1 week',
-        onClick(picker) {
-          picker.$emit('pick', DateTime.endOfDay(DateTime.inNWeeks(1)));
-        },
-      }, {
-        text: '+2 weeks',
-        onClick(picker) {
-          picker.$emit('pick', DateTime.endOfDay(DateTime.inNWeeks(2)));
-        },
-      }, {
-        text: 'This month',
-        onClick(picker) {
-          picker.$emit('pick', DateTime.endOfDay(DateTime.lastDayOfMonth()));
-        },
-      }, {
-        text: '+1 month',
-        onClick(picker) {
-          picker.$emit('pick', DateTime.endOfDay(DateTime.inNMonths(1)));
-        },
-      }],
-    },
+    deadlinePickerShortcuts: [{
+      text: 'Today',
+      value: () => DateTime.endOfDay(DateTime.today()),
+    }, {
+      text: 'Tomorrow',
+      value: () => DateTime.endOfDay(DateTime.tomorrow()),
+    }, {
+      text: 'This week',
+      value: () => DateTime.endOfDay(DateTime.firstDayOfWeek(6)),
+    }, {
+      text: '+1 week',
+      value: () => DateTime.endOfDay(DateTime.inNWeeks(1)),
+    }, {
+      text: '+2 weeks',
+      value: () => DateTime.endOfDay(DateTime.inNWeeks(2)),
+    }, {
+      text: 'This month',
+      value: () => DateTime.endOfDay(DateTime.lastDayOfMonth()),
+    }, {
+      text: '+1 month',
+      value: () => DateTime.endOfDay(DateTime.inNMonths(1)),
+    }],
   },
 
   data() {
@@ -202,7 +180,7 @@ export default {
           required: true,
           message: 'You didn\'t select a time segment.',
         }, {
-          validator: (_rule, value, callback) => {
+          validator: (_rule, _value, callback) => {
             if (this.timeSegments.find((segment) => segment.id === this.timeSegmentId) == null) {
               callback(new Error('The segment you selected doesn\'t exist.'));
             } else {
@@ -215,7 +193,7 @@ export default {
   },
 
   created() {
-    this.bus.$on('time-segments-changed', () => {
+    bus.$on('time-segments-changed', () => {
       this.fetchTimeSegments();
     });
     this.fetchTimeSegments();
@@ -223,17 +201,11 @@ export default {
 
   methods: {
     async addTask() {
-      let valid;
-
-      this.$refs.form.validate((valid_, erroneousFields) => {
-        valid = valid_;
-        if (!valid) {
-          const firstError = Object.entries(erroneousFields)[0][1][0];
-          this.$message.error(firstError.message);
-        }
-      });
-
-      if (!valid) {
+      try {
+        await this.$refs.form.validate();
+      } catch (errors) {
+        const firstError = Object.values(errors)[0][0];
+        this.$message.error(firstError.message);
         return;
       }
 
@@ -249,7 +221,7 @@ export default {
         await this.$api.addTask(task);
         this.$message.success('Task added!');
         this.resetFields();
-        this.bus.$emit('task-added');
+        bus.$emit('task-added');
       } catch (error) {
         this.handleError(error);
       }

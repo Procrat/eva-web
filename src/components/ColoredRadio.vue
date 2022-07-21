@@ -52,20 +52,17 @@ import Color from 'color';
 export default {
   name: 'ColoredRadio',
 
-  model: {
-    prop: 'selectedValue',
-    event: 'input',
-  },
-
   props: {
     value: { type: null, required: true },
     label: { type: String, required: true },
+    modelValue: { type: null, default: null },
     selectedLabel: { type: String, default: null },
-    selectedValue: { type: null, default: null },
     groupName: { type: String, required: true },
     disabled: { type: Boolean, default: false },
     color: { type: Color, default: undefined },
   },
+
+  emits: ['update:modelValue', 'update:selectedLabel'],
 
   data() {
     return {
@@ -82,8 +79,8 @@ export default {
   methods: {
     select() {
       if (!this.disabled) {
+        this.$emit('update:modelValue', this.value);
         this.$emit('update:selectedLabel', this.label);
-        this.$emit('input', this.value);
       }
     },
   },
@@ -91,7 +88,7 @@ export default {
 </script>
 
 <style scoped lang="sass">
-@import "element-ui/packages/theme-chalk/src/mixins/mixins.scss"
+@use 'element-plus/theme-chalk/src/mixins/mixins.scss' as *
 
 @include b(radio)
   @include e(input)
@@ -108,7 +105,7 @@ export default {
 </style>
 
 <style lang="sass">
-@import "element-ui/packages/theme-chalk/src/mixins/mixins.scss"
+@use 'element-plus/theme-chalk/src/mixins/mixins.scss' as *
 
 /* Unscoped styling for when the slot contains an input field */
 @include b(radio)

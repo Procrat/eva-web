@@ -1,3 +1,7 @@
+<script setup>
+import Cell from '@/components/TimeSegmentPickerCell.vue';
+</script>
+
 <template>
   <table :class="{ 'selectable': selectable }">
     <caption v-if="selectable">
@@ -40,7 +44,6 @@
 <script>
 import * as DateTime from '@/datetime';
 import { TimeSegment } from '@/api';
-import Cell from '@/components/TimeSegmentPickerCell.vue';
 
 export class Selection {
   constructor(name, color, first, second) {
@@ -153,10 +156,6 @@ export class Selection {
 export default {
   name: 'TimeSegmentPicker',
 
-  components: {
-    Cell,
-  },
-
   constants: {
     days: DateTime.DAYS_OF_THE_WEEK.map((_, index) => new DateTime.Day(index)),
     times: Array.from({ length: 24 }, (_, i) => new DateTime.Time(i)),
@@ -167,6 +166,8 @@ export default {
     selectedSegment: { type: TimeSegment, default: null },
     disabled: { type: Boolean, default: false },
   },
+
+  emits: ['selection-changed'],
 
   data() {
     return {

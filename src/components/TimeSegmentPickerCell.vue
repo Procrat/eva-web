@@ -28,6 +28,8 @@ export default {
     selected: { type: Boolean, default: false },
   },
 
+  emits: ['mousedown', 'mouseover', 'mouseup'],
+
   computed: {
     backgroundColor() {
       if (this.color == null) {

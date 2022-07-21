@@ -5,6 +5,8 @@
 import imgURL from '@/assets/500.jpeg';
 
 export default function error500(reason) {
+  console.error(reason);
+
   const head = document.getElementsByTagName('head')[0];
   head.insertAdjacentHTML('beforeend', `
     <style>
@@ -57,7 +59,7 @@ export default function error500(reason) {
     </a>
     <p class="centered-hover">
       Unfortunately, I'm having some issues today.
-      Do you think you could manage on you own for a while?
+      Do you think you could manage on your own for a while?
       Could you also
         <a href="https://github.com/Procrat/eva-web/issues/new">let my developer know</a>
       what happened? Tell him that loading the API failed ${moreInfo}.
