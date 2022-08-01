@@ -24,7 +24,7 @@
     "vue": "^3.2.37",
     "vue-constants": "^1.0.3",
     "vue-gtag": "^2.0.1",
-    "vue-router": "^4.1.2"
+    "vue-router": "^4.1.3"
   },
   "devDependencies": {
     "@babel/core": "^7.18.9",
