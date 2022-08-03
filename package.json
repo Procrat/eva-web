@@ -29,7 +29,7 @@
   "devDependencies": {
     "@babel/core": "^7.18.10",
     "@babel/plugin-syntax-dynamic-import": "^7.8.3",
-    "@babel/preset-env": "^7.18.9",
+    "@babel/preset-env": "^7.18.10",
     "@soda/friendly-errors-webpack-plugin": "^1.8.1",
     "autoprefixer": "^10.4.8",
     "babel-loader": "^8.2.5",
