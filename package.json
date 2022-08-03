@@ -17,7 +17,7 @@
     "@element-plus/icons-vue": "^2.0.6",
     "color": "^4.2.3",
     "core-js": "^3.24.1",
-    "element-plus": "^2.2.10",
+    "element-plus": "^2.2.12",
     "fast-text-encoding": "^1.0.4",
     "pouchdb": "^7.3.0",
     "pouchdb-find": "^7.3.0",
