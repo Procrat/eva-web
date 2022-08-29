@@ -27,7 +27,7 @@
     "vue-router": "^4.1.5"
   },
   "devDependencies": {
-    "@babel/core": "^7.18.10",
+    "@babel/core": "^7.18.13",
     "@babel/plugin-syntax-dynamic-import": "^7.8.3",
     "@babel/preset-env": "^7.18.10",
     "@soda/friendly-errors-webpack-plugin": "^1.8.1",
