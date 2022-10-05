@@ -67,7 +67,7 @@
     "postcss-normalize": "^10.0.1",
     "sass": "^1.55.0",
     "sass-loader": "^13.0.2",
-    "source-map-explorer": "^2.5.2",
+    "source-map-explorer": "^2.5.3",
     "style-loader": "^3.3.1",
     "vue-loader": "^17.0.0",
     "webpack": "^5.74.0",
