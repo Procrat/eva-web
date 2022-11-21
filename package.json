@@ -20,7 +20,7 @@
     "element-plus": "^2.2.22",
     "fast-text-encoding": "^1.0.6",
     "pouchdb": "^7.3.1",
-    "pouchdb-find": "^7.3.0",
+    "pouchdb-find": "^7.3.1",
     "vue": "^3.2.41",
     "vue-constants": "^1.0.3",
     "vue-gtag": "^2.0.1",
