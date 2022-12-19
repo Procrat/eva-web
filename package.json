@@ -58,7 +58,7 @@
     "karma-mocha": "^2.0.1",
     "karma-mocha-reporter": "^2.2.5",
     "karma-sourcemap-loader": "^0.3.8",
-    "karma-spec-reporter": "^0.0.35",
+    "karma-spec-reporter": "^0.0.36",
     "karma-webpack": "^5.0.0",
     "mini-css-extract-plugin": "^2.7.2",
     "mocha": "^10.2.0",
