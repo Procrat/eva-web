@@ -14,7 +14,7 @@
     "analyze": "webpack --progress --config build/webpack.analyze.js"
   },
   "dependencies": {
-    "@element-plus/icons-vue": "^2.0.10",
+    "@element-plus/icons-vue": "^2.1.0",
     "color": "^4.2.3",
     "core-js": "^3.27.2",
     "element-plus": "^2.3.3",
