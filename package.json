@@ -16,7 +16,7 @@
   "dependencies": {
     "@element-plus/icons-vue": "^2.1.0",
     "color": "^4.2.3",
-    "core-js": "^3.30.2",
+    "core-js": "^3.32.1",
     "element-plus": "^2.3.8",
     "fast-text-encoding": "^1.0.6",
     "pouchdb": "^7.3.1",
