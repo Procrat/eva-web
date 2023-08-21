@@ -68,7 +68,7 @@
     "sass": "^1.62.1",
     "sass-loader": "^13.3.2",
     "source-map-explorer": "^2.5.3",
-    "style-loader": "^3.3.1",
+    "style-loader": "^3.3.3",
     "vue-loader": "^17.2.2",
     "webpack": "^5.87.0",
     "webpack-bundle-analyzer": "^4.9.0",
