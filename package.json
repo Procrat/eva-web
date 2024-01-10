@@ -65,7 +65,7 @@
     "mocha-clean": "^1.0.0",
     "postcss-loader": "^7.3.2",
     "postcss-normalize": "^10.0.1",
-    "sass": "^1.62.1",
+    "sass": "^1.69.7",
     "sass-loader": "^13.3.2",
     "source-map-explorer": "^2.5.3",
     "style-loader": "^3.3.3",
