@@ -19,7 +19,7 @@
     "core-js": "^3.34.0",
     "element-plus": "^2.4.1",
     "fast-text-encoding": "^1.0.6",
-    "pouchdb": "^7.3.1",
+    "pouchdb": "^9.0.0",
     "pouchdb-find": "^7.3.1",
     "vue": "^3.3.6",
     "vue-constants": "^1.0.3",
